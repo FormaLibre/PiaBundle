@@ -1,0 +1,25 @@
+{
+    "name": "laurent/pia-bundle",
+    "description": "Claroline plugin adding PIA",
+    "keywords": ["Claroline", "Plugin", "School", "Ecole", "PIA"],
+    "homepage": "http://www.claroline.net",
+    "type": "claroline-plugin",
+    "license": "GPL-3.0+",
+    "authors": [
+        {
+            "name": "Laurent Gruber",
+            "email": "laurent@sk1.be",
+            "homepage": "http://github.com/LaurentGruber"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.1",
+        "claroline/core-bundle": ">=3.2",
+        "laurent/school-bundle": "dev-master",
+        "laurent/bulletin-bundle": "dev-master"
+    },
+    "autoload": {
+        "psr-0": { "Laurent\\PiaBundle": "" }
+    },
+    "target-dir": "Laurent/PiaBundle"
+}

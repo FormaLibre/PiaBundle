@@ -1,0 +1,3 @@
+laurent_pia_controller:
+    resource: "@LaurentPiaBundle/Controller/PiaController.php"
+    type:     annotation
