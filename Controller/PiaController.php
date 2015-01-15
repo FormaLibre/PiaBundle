@@ -166,7 +166,7 @@ class PiaController extends Controller
         $this->em->persist($tache);
         $this->em->flush();
 
-        return Response::HTTP_ACCEPTED;
+        return $this->render('LaurentPiaBundle::PiaFiche.html.twig', array('user' => $tache->getEleves()));
     }
 
 
