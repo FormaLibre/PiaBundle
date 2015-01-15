@@ -18,7 +18,7 @@ class LaurentPiaBundle extends PluginBundle
 
     public function hasMigrations()
     {
-        return true;
+        return false;
     }
 }
 

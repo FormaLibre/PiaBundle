@@ -1,0 +1,35 @@
+<div class="panel-heading">
+    <div class="row">
+        <div class="col-xs-11">    <h1>Plan individuel de remediation</h1></div>
+        <div class="col-xs-1"><i class="fa fa-plus-circle click addTache" data-user-id="{{ user.getId() }}"></i></div>
+    </div>
+
+</div>
+<div class="panel-body">
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>Action</th>
+            <th>Responsable</th>
+            <th>Commentaire</th>
+            <th>Suivi</th>
+        </tr>
+        </thead>
+        {% for tache in taches %}
+            {% if tache.fini == true %}
+                <tr class="success">
+            {% else %}
+                <tr class="warning">
+            {% endif %}
+                <td>{{ tache.action.getName() }} - {{ tache.titre }}</td>
+                <td>{{ tache.responsable.getLastName() }}</td>
+                <td>{{ tache.commentaire|raw }}</td>
+                <td>
+                    <i class="fa fa-search click viewSuivi" data-tache-id="{{ tache.getId() }}"></i>
+                    <i class="fa fa-close click closeSuivi" data-tache-id="{{ tache.getId() }}"></i>
+                </td>
+            </tr>
+        {% endfor %}
+
+    </table>
+</div>

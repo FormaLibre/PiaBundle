@@ -1,1 +1,15 @@
-toto
+{% extends "ClarolineCoreBundle:Workspace:layout.html.twig" %}
+
+{% block section_content %}
+    <div class="panel-heading">
+        <h1>Les classes</h1>
+    </div>
+    <div class="panel-body">
+        <table class="table">
+        {% for group in groups %}
+            <tr><td><a href="{{ path ('laurentPiaCdc', {'group' : group.id()}) }}">
+                        {{ group.Name() }}</a> </td></tr>
+        {% endfor %}
+        </table>
+    </div>
+{% endblock %}

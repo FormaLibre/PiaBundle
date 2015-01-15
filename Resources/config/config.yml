@@ -5,4 +5,4 @@ plugin:
     - name: laurent_pia_tool
       is_displayable_in_workspace: false
       is_displayable_in_desktop: true
-      class: fa-book
+      class: book

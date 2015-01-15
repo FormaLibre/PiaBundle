@@ -1,0 +1,92 @@
+{% extends "ClarolineCoreBundle:Workspace:layout.html.twig" %}
+
+{% block section_content %}
+    <div class="panel-heading">
+        <h1>Plan individuel d'apprentissage de {{ user.getFirstName() }} {{ user.getLastName() }}</h1>
+    </div>
+    <div class="panel-body">
+        <div class="col-xs-8">
+            <div class="row">
+                <div class="panel panel-default piaWidget">
+                    <p>Tél parents :</p>
+                    <p>Date de naissance :</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="panel panel-default piaWidget">
+                    {{ render(controller('LaurentPiaBundle:Pia:pirWidget', { 'user': user.getId() } )) }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="panel panel-default piaWidget">
+                    {{ render(controller('LaurentBulletinBundle:Bulletin:bulletinWidget', { 'user': user.getId() } )) }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-6">
+                    <div class="panel panel-default piaWidget">
+                        <div class="panel-heading">Présence</div>
+                        <div class="panel-body"></div>
+                    </div>
+                </div>
+                <div class="col-xs-6">
+                    <div class="panel panel-default piaWidget">
+                        <div class="panel-heading">Comportement</div>
+                        <div class="panel-body"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-4">
+            <div class="row">
+                <div class="panel panel-default center" style="margin-left: 15px">
+                    {% if user.getPicture() %}
+                        <img src="{{ asset('uploads/pictures/') ~ user.getPicture() }}" />
+                    {% else %}
+                        <i class="fa fa-user fa-6"></i>
+                    {% endif %}
+
+                </div>
+            </div>
+            <div class="row">
+                <div class="panel panel-default center piaWidget" style="margin-left: 15px">
+                    <div class="panel-heading">Tag <i class="fa fa-plus-circle"></i></div>
+                    <div class="panel-body">Urgent</div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="panel panel-default center piaWidget" style="margin-left: 15px">
+                    <div class="panel-heading">Autres constats <i class="fa fa-plus-circle"></i></div>
+                    <div class="panel-body">Texte</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- box pour l'ajout -->
+    <div id="form-modal-box" class="modal fade" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h3 id="form-modal-title"></h3>
+                </div>
+                <div id="form-modal-body" class="modal-body">
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('bundles/laurentpia/css/piaFiche.css')}}"/>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script
+            src='{{ asset('bundles/laurentpia/js/fiche.js') }}'
+            type="text/javascript">
+    </script>
+{% endblock %}

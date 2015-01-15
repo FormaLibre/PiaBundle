@@ -1,0 +1,41 @@
+<div class="panel-heading">
+    <div class="row">
+        <div class="col-xs-11">    <h3>Suivi {{ tache.action.getName() }} - {{ tache.titre }}</h3></div>
+        <div class="col-xs-1"></div>
+    </div>
+
+</div>
+<div class="panel-body">
+    <form action="{{ path('laurentPiaSuivi', {'tache':tache.id}) }}" method="POST" {{ form_enctype(form) }} autocomplete="off">
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>Date</th>
+            <th>Intervenant</th>
+            <th>Description</th>
+            <th>Edit</th>
+        </tr>
+        </thead>
+        <tr>
+
+                    <td>{{ form_widget(form.date) }}</td>
+                    <td>{{ form_widget(form.intervenant) }}</td>
+                    <td>{{ form_widget(form.description) }}</td>
+                    <td>{{ form_widget(form.save) }}</td>
+                    {{ form_rest(form) }}
+
+        </tr>
+
+        {% for suivi in suivis %}
+            <tr class="warning">
+                <td>{{ suivi.date|date('d/m/Y') }}</td>
+                <td>{{ suivi.intervenant.getUsername() }}</td>
+                <td>{{ suivi.description|raw }}</td>
+                <td><i class="fa fa-search click editSuivi" data-suivi-id="{{ suivi.getId() }}"></i></td>
+            </tr>
+        {% endfor %}
+
+
+    </table>
+    </form>
+</div>

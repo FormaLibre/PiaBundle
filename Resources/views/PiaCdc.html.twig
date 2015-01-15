@@ -1,0 +1,17 @@
+{% extends "ClarolineCoreBundle:Workspace:layout.html.twig" %}
+
+{% block section_content %}
+    <div class="panel-heading">
+        <h1>Élèves du group {{ group.getName() }}</h1>
+    </div>
+    <div class="panel-body">
+        <table class="table">
+        {% for eleve in eleves %}
+            <tr>
+                <td><a href="{{ path ('laurentPiaFiche', {'user' : eleve.id()}) }}">{{ eleve.getFirstName() }} {{ eleve.getLastName() }}</a> </td>
+
+            </tr>
+        {% endfor %}
+        </table>
+    </div>
+{% endblock %}
