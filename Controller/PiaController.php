@@ -18,6 +18,7 @@ use Laurent\PiaBundle\Entity\Actions;
 use Laurent\PiaBundle\Entity\Taches;
 use Laurent\PiaBundle\Form\TacheType;
 use Laurent\PiaBundle\Form\SuiviType;
+use Laurent\PiaBundle\Form\ActionType;
 use Laurent\BulletinBundle\Manager\TotauxManager;
 
 class PiaController extends Controller
@@ -203,6 +204,28 @@ class PiaController extends Controller
         $params = array('tache' => $tache, 'suivis' => $suivi, 'form' =>  $form->createView());
 
         return $this->render('LaurentPiaBundle::suiviWidget.html.twig', $params);
+    }
+
+    /**
+     * @EXT\Route("/action/create", name="laurentPiaActionCreate", options = {"expose"=true})
+     *
+     * @EXT\Template("LaurentPiaBundle::ActionForm.html.twig")
+     */
+    public function CreateAction(Request $request)
+    {
+        $this->checkOpen();
+        $action = new Actions();
+        $form = $this->createForm(new ActionType, $action);
+
+        if ($request->getMethod() === 'POST') {
+            $form->handleRequest($request);
+
+            if ($form->isValid()) {
+                $this->em->persist($action);
+                $this->em->flush();
+            }
+        }
+        return array('form' => $form->createView());
     }
 
     private function checkOpen()
