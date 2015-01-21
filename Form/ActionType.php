@@ -21,7 +21,7 @@ class ActionType extends AbstractType
                 'class' => 'Claroline\CoreBundle\Entity\User',
                 'query_builder' => function (UserRepository $userRepository) {
                         $query = $userRepository->createQueryBuilder('u')
-                            ->join('u.group', 'g', 'WITH', 'g.name = \'ProfD1\'');
+                            ->join('u.groups', 'g', 'WITH', 'g.name = \'ProfD1\'');
                         return $query;
                     },
                 'property' => 'username'

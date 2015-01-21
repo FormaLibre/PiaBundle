@@ -20,11 +20,19 @@ $('.addTache').on('click', function (event) {
             'laurentPiaTacheAdd', {'user':userId}
         ),
         type: 'GET',
-        success: function (datas) {
-            openFormModal(
-                "Ajouter une tâche",
-                datas
-            );
+        success: function(datas, textStatus, jqXHR) {
+            switch (jqXHR.status) {
+                case 202:
+                    closeFormModal();
+                    window.location.reload();
+                    break;
+                default:
+                    openFormModal(
+                        "Ajouter une tâche",
+                        datas
+                    );
+                    break;
+            }
         }
     });
 });
@@ -145,7 +153,7 @@ $('body').on('click', '#form-tache-ok-btn', function (e) {
         processData: false,
         contentType: false,
         success: function(datas, textStatus, jqXHR) {
-                    window.location.reload();
+            window.location.reload();
 
         }
     });

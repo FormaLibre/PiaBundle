@@ -169,28 +169,6 @@ class PiaController extends Controller
         return $this->render('LaurentPiaBundle::suiviWidget.html.twig', $params);
     }
 
-    /**
-     * @EXT\Route("/action/create", name="laurentPiaActionCreate", options = {"expose"=true})
-     *
-     * @EXT\Template("LaurentPiaBundle::ActionForm.html.twig")
-     */
-    public function CreateAction(Request $request)
-    {
-        $this->checkOpen();
-        $action = new Actions();
-        $form = $this->createForm(new ActionType, $action);
-
-        if ($request->getMethod() === 'POST') {
-            $form->handleRequest($request);
-
-            if ($form->isValid()) {
-                $this->em->persist($action);
-                $this->em->flush();
-            }
-        }
-        return array('form' => $form->createView());
-    }
-
     private function checkOpen()
     {
         if ($this->sc->isGranted('ROLE_PROF')) {

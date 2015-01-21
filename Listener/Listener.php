@@ -47,6 +47,18 @@ class Listener
 
     }
 
+    /**
+     * @DI\Observe("administration_tool_laurent_pia_admin_tool")
+     *
+     * @param OpenAdministrationToolEvent $event
+     */
+    public function onOpenAdminTool(OpenAdministrationToolEvent $event)
+    {
+        $params = array();
+        $params['_controller'] = 'LaurentPiaBundle:PiaAction:ActionList';
+        $this->redirect($params, $event);
+    }
+
 
     private function redirect($params, $event)
     {

@@ -25,7 +25,7 @@ class TacheType extends AbstractType
                     },
                 'property' => 'username'
             ))
-            ->add('fini')
+            ->add('fini', 'checkbox', array('label'=>'Terminée'))
             ->add('priorite', 'number', array('label'=>'Priorite'))
             ;
     }
