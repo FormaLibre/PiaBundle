@@ -132,43 +132,6 @@ class PiaController extends Controller
         return $this->render('LaurentPiaBundle::PirWidget.html.twig', $params);
     }
 
-    /**
-     * @EXT\Route("/tache/add/{user}", name="laurentPiaTacheAdd", options = {"expose"=true})
-     *
-     * @EXT\Template("LaurentPiaBundle::TacheForm.html.twig")
-     */
-    public function TacheAddAction(Request $request, User $user)
-    {
-        $this->checkOpen();
-        $taches = new Taches();
-        $form = $this->createForm(new TacheType, $taches);
-
-        if ($request->getMethod() === 'POST') {
-            $form->handleRequest($request);
-
-            if ($form->isValid()) {
-                $taches->setEleves($user);
-                $this->em->persist($taches);
-                $this->em->flush();
-            }
-        }
-        return array('form' => $form->createView(), 'action' => $this->generateUrl('laurentPiaTacheAdd', array('user'=>$user->getId())));
-    }
-
-    /**
-     * @EXT\Route("/tache/{tache}/close", name="laurentPiaTacheClose", options = {"expose"=true})
-     *
-     */
-    public function TacheCloseAction(Request $request, Taches $tache)
-    {
-        $this->checkOpen();
-        $tache->setFini(1);
-        $this->em->persist($tache);
-        $this->em->flush();
-
-        return $this->render('LaurentPiaBundle::PiaFiche.html.twig', array('user' => $tache->getEleves()));
-    }
-
 
     /**
      * @EXT\Route("/tache/{tache}/suivi/", name="laurentPiaSuivi", options = {"expose"=true})

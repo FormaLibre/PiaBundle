@@ -1,3 +1,7 @@
 laurent_pia_controller:
     resource: "@LaurentPiaBundle/Controller/PiaController.php"
     type:     annotation
+
+laurent_pia_tache_controller:
+    resource: "@LaurentPiaBundle/Controller/PiaTacheController.php"
+    type:     annotation

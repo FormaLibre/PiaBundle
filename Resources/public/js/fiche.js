@@ -47,7 +47,7 @@ $('.viewSuivi').on('click', function (event) {
 });
 
 // Click on widget create button
-$('.closeSuivi').on('click', function (event) {
+$('.closeTache').on('click', function (event) {
     tacheId = $(event.target).attr('data-tache-id')
     $.ajax({
         url: Routing.generate(
@@ -61,6 +61,51 @@ $('.closeSuivi').on('click', function (event) {
                     break;
                 default:
                     window.location.reload();
+                    break;
+            }
+        }
+    });
+});
+
+// Click on widget create button
+$('.deleteTache').on('click', function (event) {
+    tacheId = $(event.target).attr('data-tache-id')
+    $.ajax({
+        url: Routing.generate(
+            'laurentPiaTacheDelete', {'tache':tacheId}
+        ),
+        type: 'GET',
+        success: function(datas, textStatus, jqXHR) {
+            switch (jqXHR.status) {
+                case 202:
+                    window.location.reload();
+                    break;
+                default:
+                    window.location.reload();
+                    break;
+            }
+        }
+    });
+});
+
+// Click on widget create button
+$('.editTache').on('click', function (event) {
+    tacheId = $(event.target).attr('data-tache-id')
+    $.ajax({
+        url: Routing.generate(
+            'laurentPiaTacheEdit', {'tache':tacheId}
+        ),
+        type: 'GET',
+        success: function(datas, textStatus, jqXHR) {
+            switch (jqXHR.status) {
+                case 202:
+                    window.location.reload();
+                    break;
+                default:
+                    openFormModal(
+                        "Tache",
+                        datas
+                    );
                     break;
             }
         }
