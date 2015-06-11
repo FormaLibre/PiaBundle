@@ -85,15 +85,23 @@ class PiaController extends Controller
     {
         $this->checkOpen();
         $eleves = $this->userRepo->findByGroup($group);
-        $sorted = [];
+        $sorted = array();
+        $temp = array();
 
         foreach ($eleves as $eleve) {
-            $sorted[$this->calculIndice($eleve)] = $eleve;
+            $indice = $this->calculIndice($eleve);
+
+            if (!isset($temp[$indice])) {
+                $temp[$indice] = array();
+            }
+            $temp[$indice][] = $eleve;
         }
+        ksort($temp);
+        $temp = array_reverse($temp);
 
-        ksort($sorted);
-        $sorted = array_reverse($sorted);
-
+        foreach ($temp as $t) {
+            $sorted = array_merge($sorted, $t);
+        }
 
         $params = array('group' => $group, 'eleves' => $sorted);
 
