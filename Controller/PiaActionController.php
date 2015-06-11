@@ -6,7 +6,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration as EXT;
 use JMS\DiExtraBundle\Annotation as DI;
-use Symfony\Component\Security\Core\SecurityContextInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Doctrine\ORM\EntityManager;
 use Claroline\CoreBundle\Persistence\ObjectManager;
@@ -22,7 +22,7 @@ use Laurent\PiaBundle\Form\ActionType;
 
 class PiaActionController extends Controller
 {
-    private $sc;
+    private $authorization;
     private $em;
     private $om;
     /** @var tachesRepository */
@@ -35,19 +35,19 @@ class PiaActionController extends Controller
 
     /**
      * @DI\InjectParams({
-     *      "sc"                 = @DI\Inject("security.context"),
+     *      "authorization"      = @DI\Inject("security.authorization_checker"),
      *      "em"                 = @DI\Inject("doctrine.orm.entity_manager"),
      *      "om"                 = @DI\Inject("claroline.persistence.object_manager"),
      * })
      */
 
     public function __construct(
-        SecurityContextInterface $sc,
+        AuthorizationCheckerInterface $authorization,
         EntityManager $em,
         ObjectManager $om
     )
     {
-        $this->sc                 = $sc;
+        $this->authorization      = $authorization;
         $this->em                 = $em;
         $this->om                 = $om;
         $this->tachesRepo         = $om->getRepository('LaurentPiaBundle:Taches');
@@ -128,7 +128,7 @@ class PiaActionController extends Controller
 
     private function checkOpen()
     {
-        if ($this->sc->isGranted('ROLE_PROF')) {
+        if ($this->authorization->isGranted('ROLE_PROF')) {
             return true;
         }
 
