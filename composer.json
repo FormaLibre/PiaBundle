@@ -14,9 +14,9 @@
     ],
     "require": {
         "php": ">=5.4.1",
-        "claroline/core-bundle": ">=3.2",
-        "laurent/school-bundle": "dev-master",
-        "laurent/bulletin-bundle": "dev-master"
+        "claroline/core-bundle": "~5.0",
+        "laurent/school-bundle": "dev-5.0-dev",
+        "laurent/bulletin-bundle": "dev-5.0-dev"
     },
     "autoload": {
         "psr-0": { "Laurent\\PiaBundle": "" }
