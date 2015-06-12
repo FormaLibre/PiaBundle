@@ -158,3 +158,100 @@ $('body').on('click', '#form-tache-ok-btn', function (e) {
         }
     });
 });
+
+$('#constat-create-btn').on('click', function () {
+    var userId = $(this).data('user-id');
+        
+    window.Claroline.Modal.displayForm(
+        Routing.generate(
+            'laurentPiaConstatCreateForm',
+            {'user': userId}
+        ),
+        addConstat,
+        function() {}
+    );
+});
+    
+$('#constat-body-box').on('click', '.edit-constat-btn', function () {
+    var constatId = $(this).data('constat-id');
+        
+    window.Claroline.Modal.displayForm(
+        Routing.generate(
+            'laurentPiaConstatEditForm',
+            {'constat': constatId}
+        ),
+        editConstat,
+        function() {}
+    );
+});
+    
+$('#constat-body-box').on('click', '.delete-constat-btn', function () {
+    var constatId = $(this).data('constat-id');
+
+    window.Claroline.Modal.confirmRequest(
+        Routing.generate(
+            'laurentPiaConstatDelete',
+            {'constat': constatId}
+        ),
+        removeConstat,
+        constatId,
+        'Etes-vous sûr de vouloir supprimer ce constat ?',
+        'Suppression du constat'
+    );
+});
+
+var addConstat = function (datas) {
+    var id = datas['id'];
+    var content = datas['content'];
+    var creationDate = datas['creationDate'];
+    
+    var element = 
+        '<hr id="constat-separator-' + id + '">' +
+        '<div id="constat-box-' + id + '">' +
+            '<i class="delete-constat-btn fa fa-times close"' +
+               'data-constat-id="' + id + '"' +
+            '>' +
+            '</i>' +
+            '<span class="close">&nbsp;</span>' +
+            '<i class="edit-constat-btn fa fa-pencil close"' +
+               'data-constat-id="' + id + '"' +
+            '>' +    
+            '</i>' +
+            content +
+            '<small class="text-muted">' +
+                'Créé le ' + creationDate + '.' +
+            '</small>' +
+        '</div>';
+
+    $('#constat-body-box').append(element);    
+};
+
+var editConstat = function (datas) {
+    var id = datas['id'];
+    var content = datas['content'];
+    var creationDate = datas['creationDate'];
+    var editionDate = datas['editionDate'];
+    $('#constat-box-' + id).empty();
+    
+    var constatContent = 
+        '<i class="delete-constat-btn fa fa-times close"' +
+           'data-constat-id="' + id + '"' +
+        '>' +
+        '</i>' +
+        '<span class="close">&nbsp;</span>' +
+        '<i class="edit-constat-btn fa fa-pencil close"' +
+           'data-constat-id="' + id + '"' +
+        '>' +    
+        '</i>' +
+        content +
+        '<small class="text-muted">' +
+            'Créé le ' + creationDate + '. Dernière modification: ' + editionDate + '.' +
+        '</small>';
+
+    $('#constat-box-' + id).html(constatContent);
+};
+
+var removeConstat = function (event, constatId) {
+    $('#constat-box-' + constatId).remove();
+    $('#constat-separator-' + constatId).remove();
+};

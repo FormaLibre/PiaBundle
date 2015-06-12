@@ -1,30 +1,29 @@
 <?php
 namespace Laurent\PiaBundle\Controller;
 
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration as EXT;
 use JMS\DiExtraBundle\Annotation as DI;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Doctrine\ORM\EntityManager;
 use Claroline\CoreBundle\Persistence\ObjectManager;
+use Symfony\Component\Form\FormFactory;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 use Claroline\CoreBundle\Entity\User;
 use Claroline\CoreBundle\Entity\Group;
 use Laurent\PiaBundle\Entity\Suivis;
-use Laurent\PiaBundle\Entity\Actions;
+use Laurent\PiaBundle\Entity\Constat;
 use Laurent\PiaBundle\Entity\Taches;
-use Laurent\PiaBundle\Form\TacheType;
 use Laurent\PiaBundle\Form\SuiviType;
-use Laurent\PiaBundle\Form\ActionType;
+use Laurent\PiaBundle\Form\ConstatType;
 use Laurent\BulletinBundle\Manager\TotauxManager;
 
 class PiaController extends Controller
 {
     private $authorization;
-    private $em;
     private $om;
     /** @var tachesRepository */
     private $tachesRepo;
@@ -32,35 +31,42 @@ class PiaController extends Controller
     private $suivisRepo;
     /** @var actionsRepository */
     private $actionsRepo;
+    private $constatRepo;
     private $classeRepo;
     private $userRepo;
     private $totauxManager;
+    private $formFactory;
+    private $request;
 
     /**
      * @DI\InjectParams({
      *      "authorization"      = @DI\Inject("security.authorization_checker"),
-     *      "em"                 = @DI\Inject("doctrine.orm.entity_manager"),
      *      "om"                 = @DI\Inject("claroline.persistence.object_manager"),
      *      "totauxManager"      = @DI\Inject("laurent.manager.totaux_manager"),
+     *      "formFactory"        = @DI\Inject("form.factory"),
+     *      "requestStack"       = @DI\Inject("request_stack")
      * })
      */
 
     public function __construct(
         AuthorizationCheckerInterface $authorization,
-        EntityManager $em,
         ObjectManager $om,
-        TotauxManager $totauxManager
+        TotauxManager $totauxManager,
+        FormFactory $formFactory,
+        RequestStack $requestStack
     )
     {
         $this->authorization      = $authorization;
-        $this->em                 = $em;
         $this->om                 = $om;
         $this->tachesRepo         = $om->getRepository('LaurentPiaBundle:Taches');
         $this->suivisRepo         = $om->getRepository('LaurentPiaBundle:Suivis');
         $this->actionsRepo        = $om->getRepository('LaurentPiaBundle:Actions');
-        $this->classeRepo          = $om->getRepository('LaurentSchoolBundle:Classe');
+        $this->constatRepo        = $om->getRepository('LaurentPiaBundle:Constat');
+        $this->classeRepo         = $om->getRepository('LaurentSchoolBundle:Classe');
         $this->userRepo           = $om->getRepository('ClarolineCoreBundle:User');
         $this->totauxManager      = $totauxManager;
+        $this->formFactory        = $formFactory;
+        $this->request            = $requestStack->getCurrentRequest();
     }
 
     /**
@@ -117,8 +123,9 @@ class PiaController extends Controller
     public function ficheAction(User $user)
     {
         $this->checkOpen();
+        $constats = $this->constatRepo->findByUser($user, array('creationDate' => 'ASC'));
 
-        $params = array('user' => $user);
+        $params = array('user' => $user, 'constats' => $constats);
 
         return $this->render('LaurentPiaBundle::PiaFiche.html.twig', $params);
     }
@@ -161,8 +168,8 @@ class PiaController extends Controller
 
             if ($form->isValid()) {
                 $suiviNew->setTaches($tache);
-                $this->em->persist($suiviNew);
-                $this->em->flush();
+                $this->om->persist($suiviNew);
+                $this->om->flush();
             } else {
                 $errors = $form->getErrorsAsString();
                 var_dump($errors);
@@ -175,6 +182,138 @@ class PiaController extends Controller
         $params = array('tache' => $tache, 'suivis' => $suivi, 'form' =>  $form->createView());
 
         return $this->render('LaurentPiaBundle::suiviWidget.html.twig', $params);
+    }
+
+    /**
+     * @EXT\Route(
+     *     "constat/user/{user}/create/form",
+     *     name="laurentPiaConstatCreateForm",
+     *     options={"expose"=true}
+     * )
+     * @EXT\ParamConverter("authenticatedUser", options={"authenticatedUser" = true})
+     */
+    public function constatCreateFormAction(User $user)
+    {
+        $this->checkOpen();
+        $form = $this->formFactory->create(new ConstatType(), new Constat());
+
+        $params = array(
+            'form' => $form->createView(),
+            'user' => $user
+        );
+
+        return $this->render('LaurentPiaBundle::constatCreateModalForm.html.twig', $params);
+    }
+
+    /**
+     * @EXT\Route(
+     *     "constat/user/{user}/create",
+     *     name="laurentPiaConstatCreate",
+     *     options={"expose"=true}
+     * )
+     * @EXT\ParamConverter("authenticatedUser", options={"authenticatedUser" = true})
+     */
+    public function constatCreateAction(User $user)
+    {
+        $this->checkOpen();
+        $constat = new Constat();
+        $constat->setUser($user);
+        $form = $this->formFactory->create(new ConstatType(), $constat);
+        $form->handleRequest($this->request);
+
+        if ($form->isValid()) {
+            $constat->setCreationDate(new \DateTime());
+            $this->om->persist($constat);
+            $this->om->flush();
+            $datas = array(
+                'id' => $constat->getId(),
+                'content' => $constat->getContent(),
+                'creationDate' => $constat->getCreationDate()->format('d/m/y H:i')
+            );
+
+            return new JsonResponse($datas, 200);
+        } else {
+            $params = array(
+                'form' => $form->createView(),
+                'user' => $user
+            );
+
+            return $this->render('LaurentPiaBundle::constatCreateModalForm.html.twig', $params);
+        }
+    }
+
+    /**
+     * @EXT\Route(
+     *     "constat/{constat}/edit/form",
+     *     name="laurentPiaConstatEditForm",
+     *     options={"expose"=true}
+     * )
+     * @EXT\ParamConverter("authenticatedUser", options={"authenticatedUser" = true})
+     */
+    public function constatEditFormAction(Constat $constat)
+    {
+        $this->checkOpen();
+        $form = $this->formFactory->create(new ConstatType(), $constat);
+
+        $params = array(
+            'form' => $form->createView(),
+            'constat' => $constat
+        );
+
+        return $this->render('LaurentPiaBundle::constatEditModalForm.html.twig', $params);
+    }
+
+    /**
+     * @EXT\Route(
+     *     "constat/{constat}/edit",
+     *     name="laurentPiaConstatEdit",
+     *     options={"expose"=true}
+     * )
+     * @EXT\ParamConverter("authenticatedUser", options={"authenticatedUser" = true})
+     */
+    public function constatEditAction(Constat $constat)
+    {
+        $this->checkOpen();
+        $form = $this->formFactory->create(new ConstatType(), $constat);
+        $form->handleRequest($this->request);
+
+        if ($form->isValid()) {
+            $constat->setEditionDate(new \DateTime());
+            $this->om->persist($constat);
+            $this->om->flush();
+            $datas = array(
+                'id' => $constat->getId(),
+                'content' => $constat->getContent(),
+                'creationDate' => $constat->getCreationDate()->format('d/m/y H:i'),
+                'editionDate' => $constat->getEditionDate()->format('d/m/y H:i')
+            );
+
+            return new JsonResponse($datas, 200);
+        } else {
+            $params = array(
+                'form' => $form->createView(),
+                'constat' => $constat
+            );
+
+            return $this->render('LaurentPiaBundle::constatEditModalForm.html.twig', $params);
+        }
+    }
+
+    /**
+     * @EXT\Route(
+     *     "constat/{constat}/delete",
+     *     name="laurentPiaConstatDelete",
+     *     options={"expose"=true}
+     * )
+     * @EXT\ParamConverter("authenticatedUser", options={"authenticatedUser" = true})
+     */
+    public function constatDeleteAction(Constat $constat)
+    {
+        $this->checkOpen();
+        $this->om->remove($constat);
+        $this->om->flush();
+
+        return new JsonResponse('success', 200);
     }
 
     private function checkOpen()

@@ -55,9 +55,43 @@
                 </div>
             </div>
             <div class="row">
-                <div class="panel panel-default center piaWidget" style="margin-left: 15px">
-                    <div class="panel-heading">Autres constats <i class="fa fa-plus-circle"></i></div>
-                    <div class="panel-body">Texte</div>
+                <div class="panel panel-default piaWidget" style="margin-left: 15px">
+                    <div class="panel-heading center">
+                        Autres constats
+                        <i class="fa fa-plus-circle pointer-hand"
+                           id="constat-create-btn"
+                           data-user-id="{{ user.getId() }}"
+                        >    
+                        </i>
+                    </div>
+                    <div class="panel-body" id="constat-body-box">
+                        {% for constat in constats %}
+                            {% set constatId = constat.getId() %}
+                            <div id="constat-box-{{ constatId }}">
+                                <i class="delete-constat-btn fa fa-times close"
+                                   data-constat-id="{{ constatId }}"
+                                >
+                                </i>
+                                <span class="close">&nbsp;</span>
+                                <i class="edit-constat-btn fa fa-pencil close"
+                                   data-constat-id="{{ constatId }}"
+                                >    
+                                </i>
+                                {{ constat.getContent()|raw }}
+                                <small class="text-muted">
+                                    Créé le {{ constat.getCreationDate()|intl_date_format }}.
+                                    
+                                    {% if constat.getEditionDate() is not empty %}
+                                        Dernière modification: {{ constat.getEditionDate()|intl_date_format }}.
+                                    {% endif %}
+                                </small>
+                            </div>
+                                
+                            {% if not loop.last %}
+                                <hr id="constat-separator-{{ constatId }}">
+                            {% endif %}
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
 
