@@ -98,7 +98,17 @@
                     </div>
                 </div>
             </div>
-
+            
+            <div class="row">
+                <div class="panel panel-default piaWidget" style="margin-left: 15px">
+                    <div class="panel-heading center">
+                        Points divers
+                    </div>
+                    <div class="panel-body">
+                        {{ render(controller('LaurentBulletinBundle:Bulletin:bulletinPointsDiversWidget', { 'user': user.getId() } )) }}
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     <!-- box pour l'ajout -->
