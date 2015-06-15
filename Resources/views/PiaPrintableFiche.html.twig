@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="fr" moznomarginboxes mozdisallowselectionprint>
+<head>
+    <meta charset="utf-8">
+    <title>Récapitulatif P.I.A.</title>
+    <link rel="stylesheet" href="{{ asset('bundles/laurentbulletin/css/bootstrap.css')}}"/>
+    <link rel="stylesheet" href="{{ asset('bundles/laurentbulletin/css/bulletin.css')}}"/>
+    <link rel="stylesheet" href="{{ asset('bundles/laurentpia/css/piaFiche.css')}}"/>
+    <script type="text/javascript" src='{{ asset('bundles/frontend/jquery/jquery-2.1.0.min.js') }}'></script>
+    <script type="text/javascript" src='{{ asset('bundles/laurentbulletin/js/bootstrap.js') }}'></script>
+</head>
+
+<body>
+    <div class="container" id="content">
+        <div class="row">
+            <div class="col-xs-3">
+                <img src="http://www.fransfischer.be/logoFFnb.png" height="150px">
+            </div>
+            <div class="col-xs-7" id="title-box">
+                <h1>Récapitulatif P.I.A.</h1>
+            </div>
+            <div class="col-xs-2" id="NomEleve">
+                2014-2015<br>
+                {{ user.getLastName() }}<br>
+                {{ user.getFirstName() }}
+            </div>
+        </div>
+        <br>
+        <br>
+        <div class="row">
+            {{ render(controller('LaurentBulletinBundle:Bulletin:printableBulletinWidget', { 'user': user.getId() } )) }}
+        </div>
+        <div class="row">
+            {{ render(controller('LaurentBulletinBundle:Bulletin:printableBulletinPointsDiversWidget', { 'user': user.getId() } )) }}
+        </div>
+        <hr style="border-color: black">
+        <h1 class="text-center">Conseil</h1>
+        <br>
+        <hr style="border-color: #a3a3a3; width: 80%">
+        <br>
+        <hr style="border-color: #a3a3a3; width: 80%">
+        <br>
+        <hr style="border-color: #a3a3a3; width: 80%">
+        <br>
+        <hr style="border-color: #a3a3a3; width: 80%">
+        <br>
+        <hr style="border-color: #a3a3a3; width: 80%">
+        <br>
+        <hr style="border-color: #a3a3a3; width: 80%">
+        <br>
+        <hr style="border-color: #a3a3a3; width: 80%">
+    </div>
+</body>
+</html>

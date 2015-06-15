@@ -2,7 +2,17 @@
 
 {% block section_content %}
     <div class="panel-heading">
-        <h1>Plan individuel d'apprentissage de {{ user.getFirstName() }} {{ user.getLastName() }}</h1>
+        <span  class="pull-right">
+            <a href="{{ path('laurentPiaPrintableFiche', {'user': user.getId()}) }}">
+                <i class="fa fa-eye"></i>
+            </a>
+            <a href="{{ path('laurentPiaFichePrint', {'user': user.getId()}) }}">
+                <i class="fa fa-print"></i>
+            </a>
+        </span>
+        <h1>
+            Plan individuel d'apprentissage de {{ user.getFirstName() }} {{ user.getLastName() }}
+        </h1>
     </div>
     <div class="panel-body">
         <div class="col-xs-8">
