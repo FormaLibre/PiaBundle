@@ -148,9 +148,8 @@ class PiaController extends Controller
     public function fichePrintAction(User $user)
     {
         $this->checkOpen();
-
         $filename = $user->getLastName() . $user->getFirstName(). '-PIA-'. date("Y-m-d-H-i-s") . '.pdf';
-        $dir = $this->pdfDir . '/' . $filename;
+        $dir = $this->pdfDir . 'PIA/' . $filename;
 
         $eleveUrl = $this->generateUrl('laurentPiaPrintableFiche', array('user' => $user->getId()), true);
         $this->get('knp_snappy.pdf')->generate($eleveUrl, $dir);
@@ -161,14 +160,6 @@ class PiaController extends Controller
         );
 
         return new Response(file_get_contents($dir), 200, $headers);
-
-
-//        $this->checkOpen();
-//        $constats = $this->constatRepo->findByUser($user, array('creationDate' => 'ASC'));
-//
-//        $params = array('user' => $user, 'constats' => $constats);
-//
-//        return $this->render('LaurentPiaBundle::PiaPrintableFiche.html.twig', $params);
     }
 
     /**

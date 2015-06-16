@@ -14,40 +14,32 @@
     <div class="container" id="content">
         <div class="row">
             <div class="col-xs-3">
-                <img src="http://www.fransfischer.be/logoFFnb.png" height="150px">
+                <img src="http://www.fransfischer.be/logoFFnb.png" height="100px">
             </div>
-            <div class="col-xs-7" id="title-box">
-                <h1>Récapitulatif P.I.A.</h1>
+            <div class="col-xs-6" id="title-box">
+                <h2>Récapitulatif P.I.A.</h2>
             </div>
-            <div class="col-xs-2" id="NomEleve">
+            <div class="col-xs-3" id="NomEleve">
                 2014-2015<br>
                 {{ user.getLastName() }}<br>
                 {{ user.getFirstName() }}
             </div>
         </div>
-        <br>
-        <br>
         <div class="row">
             {{ render(controller('LaurentBulletinBundle:Bulletin:printableBulletinWidget', { 'user': user.getId() } )) }}
         </div>
         <div class="row">
             {{ render(controller('LaurentBulletinBundle:Bulletin:printableBulletinPointsDiversWidget', { 'user': user.getId() } )) }}
         </div>
-        <hr style="border-color: black">
-        <h1 class="text-center">Conseil</h1>
-        <br>
+        <h3 class="text-center">Conseil</h3>
         <hr style="border-color: #a3a3a3; width: 80%">
-        <br>
         <hr style="border-color: #a3a3a3; width: 80%">
-        <br>
         <hr style="border-color: #a3a3a3; width: 80%">
-        <br>
         <hr style="border-color: #a3a3a3; width: 80%">
-        <br>
         <hr style="border-color: #a3a3a3; width: 80%">
-        <br>
         <hr style="border-color: #a3a3a3; width: 80%">
-        <br>
+        <hr style="border-color: #a3a3a3; width: 80%">
+        <hr style="border-color: #a3a3a3; width: 80%">
         <hr style="border-color: #a3a3a3; width: 80%">
     </div>
 </body>
