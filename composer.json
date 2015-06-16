@@ -16,7 +16,7 @@
         "php": ">=5.4.1",
         "claroline/core-bundle": "~5.0",
         "laurent/school-bundle": "~5.0",
-        "laurent/bulletin-bundle": "~5.0"
+        "laurent/bulletin-bundle": "~5.1"
     },
     "autoload": {
         "psr-0": { "Laurent\\PiaBundle": "" }

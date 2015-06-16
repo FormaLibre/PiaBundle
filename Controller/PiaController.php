@@ -3,6 +3,8 @@ namespace Laurent\PiaBundle\Controller;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration as EXT;
 use JMS\DiExtraBundle\Annotation as DI;
@@ -10,7 +12,6 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Claroline\CoreBundle\Persistence\ObjectManager;
 use Symfony\Component\Form\FormFactory;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 use Claroline\CoreBundle\Entity\User;
 use Claroline\CoreBundle\Entity\Group;
@@ -37,6 +38,8 @@ class PiaController extends Controller
     private $totauxManager;
     private $formFactory;
     private $request;
+    /** @var  string */
+    private $pdfDir;
 
     /**
      * @DI\InjectParams({
@@ -44,7 +47,8 @@ class PiaController extends Controller
      *      "om"                 = @DI\Inject("claroline.persistence.object_manager"),
      *      "totauxManager"      = @DI\Inject("laurent.manager.totaux_manager"),
      *      "formFactory"        = @DI\Inject("form.factory"),
-     *      "requestStack"       = @DI\Inject("request_stack")
+     *      "requestStack"       = @DI\Inject("request_stack"),
+     *      "pdfDir"             = @DI\Inject("%laurent.directories.pdf%")
      * })
      */
 
@@ -53,7 +57,8 @@ class PiaController extends Controller
         ObjectManager $om,
         TotauxManager $totauxManager,
         FormFactory $formFactory,
-        RequestStack $requestStack
+        RequestStack $requestStack,
+        $pdfDir
     )
     {
         $this->authorization      = $authorization;
@@ -67,6 +72,7 @@ class PiaController extends Controller
         $this->totauxManager      = $totauxManager;
         $this->formFactory        = $formFactory;
         $this->request            = $requestStack->getCurrentRequest();
+        $this->pdfDir             = $pdfDir;
     }
 
     /**
@@ -128,6 +134,51 @@ class PiaController extends Controller
         $params = array('user' => $user, 'constats' => $constats);
 
         return $this->render('LaurentPiaBundle::PiaFiche.html.twig', $params);
+    }
+
+    /**
+     * @EXT\Route(
+     *     "/user/{user}/printable/fiche/print",
+     *     name="laurentPiaFichePrint"
+     * )
+     *
+     * @param User $user
+     *
+     */
+    public function fichePrintAction(User $user)
+    {
+        $this->checkOpen();
+        $filename = $user->getLastName() . $user->getFirstName(). '-PIA-'. date("Y-m-d-H-i-s") . '.pdf';
+        $dir = $this->pdfDir . 'PIA/' . $filename;
+
+        $eleveUrl = $this->generateUrl('laurentPiaPrintableFiche', array('user' => $user->getId()), true);
+        $this->get('knp_snappy.pdf')->generate($eleveUrl, $dir);
+
+        $headers = array(
+            'Content-Type'          => 'application/pdf',
+            'Content-Disposition'   => 'attachment; filename="'.$filename.'"'
+        );
+
+        return new Response(file_get_contents($dir), 200, $headers);
+    }
+
+    /**
+     * @EXT\Route(
+     *     "/user/{user}/printable/fiche/",
+     *     name="laurentPiaPrintableFiche"
+     * )
+     *
+     * @param User $user
+     *
+     */
+    public function fichePrintableVersionAction(User $user)
+    {
+        $this->checkOpen();
+        $constats = $this->constatRepo->findByUser($user, array('creationDate' => 'ASC'));
+
+        $params = array('user' => $user, 'constats' => $constats);
+
+        return $this->render('LaurentPiaBundle::PiaPrintableFiche.html.twig', $params);
     }
 
     /**
