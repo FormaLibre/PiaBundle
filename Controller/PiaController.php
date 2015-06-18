@@ -164,6 +164,37 @@ class PiaController extends Controller
 
     /**
      * @EXT\Route(
+     *     "/group/{group}/printable/fiche/print",
+     *     name="laurentPiaGroupFichePrint",
+     *     options = {"expose"=true}
+     * )
+     *
+     * @param Group $group
+     *
+     */
+    public function groupFichePrintAction(Group $group)
+    {
+        $this->checkOpen();
+        $filename = $group->getName(). '-PIA-'. date("Y-m-d-H-i-s") . '.pdf';
+        $dir = $this->pdfDir . 'PIA/' . $group->getName() . '/' . $filename;
+        $eleves = $this->userRepo->findByGroup($group);
+        $elevesUrl = array();
+
+        foreach ($eleves as $eleve){
+            $elevesUrl[] = $this->generateUrl('laurentPiaPrintableFiche', array('user' => $eleve->getId()), true);
+        }
+        $this->get('knp_snappy.pdf')->generate($elevesUrl, $dir);
+
+        $headers = array(
+            'Content-Type'          => 'application/pdf',
+            'Content-Disposition'   => 'attachment; filename="'.$filename.'"'
+        );
+
+        return new Response(file_get_contents($dir), 200, $headers);
+    }
+
+    /**
+     * @EXT\Route(
      *     "/user/{user}/printable/fiche/",
      *     name="laurentPiaPrintableFiche"
      * )
@@ -171,9 +202,10 @@ class PiaController extends Controller
      * @param User $user
      *
      */
-    public function fichePrintableVersionAction(User $user)
+    public function fichePrintableVersionAction(Request $request, User $user)
     {
-        $this->checkOpen();
+        $this->checkOpenPrintPdf($request);
+//        $this->checkOpen();
         $constats = $this->constatRepo->findByUser($user, array('creationDate' => 'ASC'));
 
         $params = array('user' => $user, 'constats' => $constats);
@@ -376,6 +408,23 @@ class PiaController extends Controller
         throw new AccessDeniedException();
     }
 
+    private function checkOpenPrintPdf(Request $request = NULL)
+    {
+        //$ServerIp =  system("curl -s ipv4.icanhazip.com");
+
+        if ($this->authorization->isGranted('ROLE_BULLETIN_ADMIN') or $this->authorization->isGranted('ROLE_PROF')) {
+            return true;
+        }
+        elseif (!is_null($request) && $request->getClientIp() === '127.0.0.1'){
+            return true;
+        }
+
+        elseif (!is_null($request) && $request->getClientIp() == '91.121.211.13'){
+            return true;
+        }
+
+        throw new AccessDeniedException();
+    }
 
     public function calculIndice(User $user){
 

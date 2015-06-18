@@ -7,8 +7,18 @@
     <div class="panel-body">
         <table class="table">
         {% for group in groups %}
-            <tr><td><a href="{{ path ('laurentPiaCdc', {'group' : group.id()}) }}">
-                        {{ group.Name() }}</a> </td></tr>
+            <tr>
+                <td>
+                    <a href="{{ path ('laurentPiaCdc', {'group' : group.id()}) }}">
+                        {{ group.Name() }}
+                    </a> 
+                </td>
+                <td>
+                    <a href="{{ path('laurentPiaGroupFichePrint', {'group': group.getId()}) }}">
+                        Imprimer la classe
+                    </a> 
+                </td>
+            </tr>
         {% endfor %}
         </table>
     </div>
