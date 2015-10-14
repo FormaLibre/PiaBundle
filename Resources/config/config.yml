@@ -2,11 +2,11 @@ plugin:
   has_options: false
 
   tools:
-    - name: laurent_pia_tool
+    - name: formalibre_pia_tool
       is_displayable_in_workspace: false
       is_displayable_in_desktop: true
       class: book
 
   admin_tools:
-    - name: laurent_pia_admin_tool
+    - name: formalibre_pia_admin_tool
       class: book
