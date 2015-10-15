@@ -2,23 +2,16 @@
 
 namespace FormaLibre\PiaBundle\Controller;
 
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration as EXT;
+use Claroline\CoreBundle\Persistence\ObjectManager;
+use Doctrine\ORM\EntityManager;
+use FormaLibre\PiaBundle\Entity\Actions;
 use JMS\DiExtraBundle\Annotation as DI;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration as EXT;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Doctrine\ORM\EntityManager;
-use Claroline\CoreBundle\Persistence\ObjectManager;
 
-use Claroline\CoreBundle\Entity\User;
-use Claroline\CoreBundle\Entity\Group;
-use FormaLibre\PiaBundle\Entity\Suivis;
-use FormaLibre\PiaBundle\Entity\Actions;
-use FormaLibre\PiaBundle\Entity\Taches;
-use FormaLibre\PiaBundle\Form\TacheType;
-use FormaLibre\PiaBundle\Form\SuiviType;
 use FormaLibre\PiaBundle\Form\ActionType;
 
 class PiaActionController extends Controller
@@ -26,12 +19,13 @@ class PiaActionController extends Controller
     private $authorization;
     private $em;
     private $om;
-    /** @var tachesRepository */
-    private $tachesRepo;
-    /** @var suivisRepository */
-    private $suivisRepo;
+
     /** @var actionsRepository */
     private $actionsRepo;
+    /** @var suivisRepository */
+    private $suivisRepo;
+    /** @var tachesRepository */
+    private $tachesRepo;
 
 
     /**
@@ -48,12 +42,13 @@ class PiaActionController extends Controller
         ObjectManager $om
     )
     {
-        $this->authorization      = $authorization;
-        $this->em                 = $em;
-        $this->om                 = $om;
-        $this->tachesRepo         = $om->getRepository('FormaLibrePiaBundle:Taches');
-        $this->suivisRepo         = $om->getRepository('FormaLibrePiaBundle:Suivis');
-        $this->actionsRepo        = $om->getRepository('FormaLibrePiaBundle:Actions');
+        $this->authorization = $authorization;
+        $this->em = $em;
+        $this->om = $om;
+
+        $this->actionsRepo = $om->getRepository('FormaLibrePiaBundle:Actions');
+        $this->suivisRepo = $om->getRepository('FormaLibrePiaBundle:Suivis');
+        $this->tachesRepo = $om->getRepository('FormaLibrePiaBundle:Taches');
 
     }
 

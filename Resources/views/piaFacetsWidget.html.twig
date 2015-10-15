@@ -1,0 +1,57 @@
+{% for facet in facets %}
+    {% set facetId = facet.getId() %}
+    {% set facetName = facet.getName() %}
+    <div class="row col-xs-12">
+        <div class="panel panel-default">
+            <div class="panel-heading center">
+                <h4 class="panel-title">
+                    <a role="button" data-toggle="collapse" href="#facet-{{ facetId }}">
+                        {{ facetName }}
+                    </a>
+                </h4>
+            </div>
+            <div id="facet-{{ facetId }}" class="panel-collapse collapse">
+                <div class="panel-body">
+                    
+                    {% if panels[facetId] is defined %}
+                        
+                        {% for panel in panels[facetId] %}
+                            {% set panelId = panel.getId() %}
+                            {% set panelName = panel.getName() %}
+                            <div class="panel panel-default">
+                                <div class="panel-heading center">
+                                    <h4 class="panel-title">
+                                        <a role="button" data-toggle="collapse" href="#panel-{{ panelId }}">
+                                            {{ panelName }}
+                                        </a>
+                                    </h4>
+                                </div>
+                                <div id="panel-{{ panelId }}" class="panel-collapse collapse in">
+                                    <div class="panel-body">
+
+                                        {% if fields[panelId] is defined %}
+
+                                            {% if fields[panelId]|length > 0 %}
+                                                <div class="table-responsive">
+                                                    <table class="table">
+
+                                                        {% for field in fields[panelId] %}
+                                                            <tr>
+                                                                <th>{{ field['name'] }}</th>
+                                                                <td>{{ field['value'] }}</td>
+                                                            </tr>
+                                                        {% endfor %}
+                                                    </table>
+                                                </div>
+                                            {% endif %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endfor %}

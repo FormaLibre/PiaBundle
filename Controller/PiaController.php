@@ -2,6 +2,7 @@
 
 namespace FormaLibre\PiaBundle\Controller;
 
+use Claroline\CoreBundle\Entity\Facet\FieldFacet;
 use Claroline\CoreBundle\Entity\Group;
 use Claroline\CoreBundle\Entity\User;
 use Claroline\CoreBundle\Persistence\ObjectManager;
@@ -12,6 +13,7 @@ use FormaLibre\PiaBundle\Entity\Suivis;
 use FormaLibre\PiaBundle\Entity\Taches;
 use FormaLibre\PiaBundle\Form\ConstatType;
 use FormaLibre\PiaBundle\Form\SuiviType;
+use FormaLibre\PiaBundle\Manager\PiaManager;
 use JMS\DiExtraBundle\Annotation as DI;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration as EXT;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -31,6 +33,7 @@ class PiaController extends Controller
     private $om;
     /** @var  string */
     private $pdfDir;
+    private $piaManager;
     private $request;
     private $totauxManager;
 
@@ -50,6 +53,7 @@ class PiaController extends Controller
      *      "formFactory"     = @DI\Inject("form.factory"),
      *      "om"              = @DI\Inject("claroline.persistence.object_manager"),
      *      "pdfDir"          = @DI\Inject("%formalibre.directories.pdf%"),
+     *      "piaManager"      = @DI\Inject("formalibre.manager.pia_manager"),
      *      "requestStack"    = @DI\Inject("request_stack"),
      *      "totauxManager"   = @DI\Inject("formalibre.manager.totaux_manager")
      * })
@@ -61,6 +65,7 @@ class PiaController extends Controller
         FormFactory $formFactory,
         ObjectManager $om,
         $pdfDir,
+        PiaManager $piaManager,
         RequestStack $requestStack,
         TotauxManager $totauxManager
     )
@@ -70,6 +75,7 @@ class PiaController extends Controller
         $this->formFactory = $formFactory;
         $this->om = $om;
         $this->pdfDir = $pdfDir;
+        $this->piaManager = $piaManager;
         $this->request = $requestStack->getCurrentRequest();
         $this->totauxManager = $totauxManager;
 
@@ -405,6 +411,63 @@ class PiaController extends Controller
         return new JsonResponse('success', 200);
     }
 
+    /**
+     * @EXT\Route(
+     *     "pia/user/{user}/facets/widget",
+     *     name="formalibre_pia_facets_widget",
+     *     options={"expose"=true}
+     * )
+     * @EXT\ParamConverter("authenticatedUser", options={"authenticatedUser" = true})
+     * @EXT\Template("FormaLibrePiaBundle::piaFacetsWidget.html.twig")
+     */
+    public function piaFacetsWidgetAction(User $user)
+    {
+        $this->checkOpen();
+        $datas = array();
+        $facets = $this->piaManager->getAllFacets();
+        $panelFacets = $this->piaManager->getAllPanelFacets();
+        $fieldFacets = $this->piaManager->getAllFieldFacets();
+        $values = $this->piaManager->getFieldFacetValuesByUser($user);
+        $panels = array();
+        $fields = array();
+
+        foreach ($panelFacets as $panel) {
+            $facetId = $panel->getFacet()->getId();
+
+            if (!isset($panels[$facetId])) {
+                $panels[$facetId] = array();
+            }
+            $panels[$facetId][] = $panel;
+        }
+
+        foreach ($fieldFacets as $field) {
+            $fieldId = $field->getId();
+            $panelId = $field->getPanelFacet()->getId();
+
+            if (!isset($fields[$panelId])) {
+                $fields[$panelId] = array();
+                $fields[$panelId][$fieldId] = array();
+            }
+            $fields[$panelId][$fieldId]['name'] = $field->getName();
+            $fields[$panelId][$fieldId]['value'] = null;
+        }
+
+        foreach ($values as $value) {
+            $field = $value->getFieldFacet();
+            $fieldId = $field->getId();
+            $type = $field->getType();
+            $panelId = $value->getFieldFacet()->getPanelFacet()->getId();
+            $fieldValue = $value->getValue();
+
+            if ($type === FieldFacet::DATE_TYPE) {
+                $fieldValue = $fieldValue->format('Y-m-d H:i');
+            }
+            $fields[$panelId][$fieldId]['value'] = $fieldValue;
+        }
+
+        return array('facets' => $facets, 'panels' => $panels, 'fields' => $fields);
+    }
+
     private function checkOpen()
     {
         if ($this->authorization->isGranted('ROLE_PROF')) {
@@ -442,5 +505,4 @@ class PiaController extends Controller
         }
         return $i;
     }
-
 }
