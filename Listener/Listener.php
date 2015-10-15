@@ -1,6 +1,6 @@
 <?php
 
-namespace Laurent\PiaBundle\Listener;
+namespace FormaLibre\PiaBundle\Listener;
 
 use Claroline\CoreBundle\Event\OpenAdministrationToolEvent;
 use Claroline\CoreBundle\Event\DisplayToolEvent;
@@ -10,8 +10,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
- * Class Listener
- * @package Laurent\PiaBundle\Listener
  * @DI\Service()
  */
 class Listener
@@ -34,13 +32,13 @@ class Listener
     }
 
     /**
-     * @DI\Observe("open_tool_desktop_laurent_pia_tool")
+     * @DI\Observe("open_tool_desktop_formalibre_pia_tool")
      *
      * @param DisplayToolEvent $event
      */
     public function onDisplayDesktop(DisplayToolEvent $event)
     {
-        $subRequest = $this->container->get('request')->duplicate(array(), null, array("_controller" => 'LaurentPiaBundle:Pia:index'));
+        $subRequest = $this->container->get('request')->duplicate(array(), null, array("_controller" => 'FormaLibrePiaBundle:Pia:index'));
         $response = $this->container->get('http_kernel')->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
 
         $event->setContent($response->getContent());
@@ -48,14 +46,14 @@ class Listener
     }
 
     /**
-     * @DI\Observe("administration_tool_laurent_pia_admin_tool")
+     * @DI\Observe("administration_tool_formalibre_pia_admin_tool")
      *
      * @param OpenAdministrationToolEvent $event
      */
     public function onOpenAdminTool(OpenAdministrationToolEvent $event)
     {
         $params = array();
-        $params['_controller'] = 'LaurentPiaBundle:PiaAction:ActionList';
+        $params['_controller'] = 'FormaLibrePiaBundle:PiaAction:ActionList';
         $this->redirect($params, $event);
     }
 

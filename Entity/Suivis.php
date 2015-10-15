@@ -1,12 +1,12 @@
 <?php
 
-namespace Laurent\PiaBundle\Entity;
+namespace FormaLibre\PiaBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="laurent_pia_suivi")
+ * @ORM\Table(name="formalibre_pia_suivi")
  */
 class Suivis
 {
@@ -37,7 +37,7 @@ class Suivis
 
     /**
      * @ORM\ManyToOne(
-     *     targetEntity="Laurent\PiaBundle\Entity\Taches",
+     *     targetEntity="FormaLibre\PiaBundle\Entity\Taches",
      *     cascade={"persist"}
      * )
      */

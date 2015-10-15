@@ -1,5 +1,6 @@
 <?php
-namespace Laurent\PiaBundle\Controller;
+
+namespace FormaLibre\PiaBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,12 +14,12 @@ use Claroline\CoreBundle\Persistence\ObjectManager;
 
 use Claroline\CoreBundle\Entity\User;
 use Claroline\CoreBundle\Entity\Group;
-use Laurent\PiaBundle\Entity\Suivis;
-use Laurent\PiaBundle\Entity\Actions;
-use Laurent\PiaBundle\Entity\Taches;
-use Laurent\PiaBundle\Form\TacheType;
-use Laurent\PiaBundle\Form\SuiviType;
-use Laurent\PiaBundle\Form\ActionType;
+use FormaLibre\PiaBundle\Entity\Suivis;
+use FormaLibre\PiaBundle\Entity\Actions;
+use FormaLibre\PiaBundle\Entity\Taches;
+use FormaLibre\PiaBundle\Form\TacheType;
+use FormaLibre\PiaBundle\Form\SuiviType;
+use FormaLibre\PiaBundle\Form\ActionType;
 
 class PiaActionController extends Controller
 {
@@ -50,27 +51,27 @@ class PiaActionController extends Controller
         $this->authorization      = $authorization;
         $this->em                 = $em;
         $this->om                 = $om;
-        $this->tachesRepo         = $om->getRepository('LaurentPiaBundle:Taches');
-        $this->suivisRepo         = $om->getRepository('LaurentPiaBundle:Suivis');
-        $this->actionsRepo        = $om->getRepository('LaurentPiaBundle:Actions');
+        $this->tachesRepo         = $om->getRepository('FormaLibrePiaBundle:Taches');
+        $this->suivisRepo         = $om->getRepository('FormaLibrePiaBundle:Suivis');
+        $this->actionsRepo        = $om->getRepository('FormaLibrePiaBundle:Actions');
 
     }
 
     /**
-     * @EXT\Route("/actions/list/", name="laurentPiaActionList")
+     * @EXT\Route("/actions/list/", name="formalibrePiaActionList")
      */
     public function ActionListAction()
     {
         $actions = $this->actionsRepo->findAll();
 
-        return $this->render('LaurentPiaBundle::PiaActionsList.html.twig', array('actions' => $actions));
+        return $this->render('FormaLibrePiaBundle::PiaActionsList.html.twig', array('actions' => $actions));
     }
 
 
     /**
-     * @EXT\Route("/action/create", name="laurentPiaActionCreate", options = {"expose"=true})
+     * @EXT\Route("/action/create", name="formalibrePiaActionCreate", options = {"expose"=true})
      *
-     * @EXT\Template("LaurentPiaBundle::ActionForm.html.twig")
+     * @EXT\Template("FormaLibrePiaBundle::ActionForm.html.twig")
      */
     public function CreateAction(Request $request)
     {
@@ -85,15 +86,15 @@ class PiaActionController extends Controller
                 $this->em->persist($action);
                 $this->em->flush();
             }
-            return $this->redirect($this->generateUrl('laurentPiaActionList'));
+            return $this->redirect($this->generateUrl('formalibrePiaActionList'));
         }
         return array('form' => $form->createView());
     }
 
     /**
-     * @EXT\Route("/action/{action}/edit", name="laurentPiaActionEdit", options = {"expose"=true})
+     * @EXT\Route("/action/{action}/edit", name="formalibrePiaActionEdit", options = {"expose"=true})
      *
-     * @EXT\Template("LaurentPiaBundle::ActionForm.html.twig")
+     * @EXT\Template("FormaLibrePiaBundle::ActionForm.html.twig")
      */
     public function PiaActionEditAction(Request $request, Actions $action)
     {
@@ -107,14 +108,14 @@ class PiaActionController extends Controller
                 $this->em->persist($action);
                 $this->em->flush();
             }
-            return $this->redirect($this->generateUrl('laurentPiaActionList'));
+            return $this->redirect($this->generateUrl('formalibrePiaActionList'));
         }
 
-        return array('form' => $form->createView(), 'action' => $this->generateUrl('laurentPiaActionEdit', array('action'=>$action->getId())));
+        return array('form' => $form->createView(), 'action' => $this->generateUrl('formalibrePiaActionEdit', array('action'=>$action->getId())));
     }
 
     /**
-     * @EXT\Route("/action/{action}/delete", name="laurentPiaActionDelete", options = {"expose"=true})
+     * @EXT\Route("/action/{action}/delete", name="formalibrePiaActionDelete", options = {"expose"=true})
      *
      */
     public function PiaTacheDeleteAction(Request $request, Actions $action)
@@ -123,7 +124,7 @@ class PiaActionController extends Controller
         $this->em->remove($action);
         $this->em->flush();
 
-        return $this->redirect($this->generateUrl('laurentPiaActionList'));
+        return $this->redirect($this->generateUrl('formalibrePiaActionList'));
     }
 
     private function checkOpen()

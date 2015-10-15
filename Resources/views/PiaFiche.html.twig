@@ -3,10 +3,10 @@
 {% block section_content %}
     <div class="panel-heading">
         <span  class="pull-right">
-            <a href="{{ path('laurentPiaPrintableFiche', {'user': user.getId()}) }}">
+            <a href="{{ path('formalibrePiaPrintableFiche', {'user': user.getId()}) }}">
                 <i class="fa fa-eye"></i>
             </a>
-            <a href="{{ path('laurentPiaFichePrint', {'user': user.getId()}) }}">
+            <a href="{{ path('formalibrePiaFichePrint', {'user': user.getId()}) }}">
                 <i class="fa fa-print"></i>
             </a>
         </span>
@@ -24,12 +24,12 @@
             </div>
             <div class="row">
                 <div class="panel panel-default piaWidget">
-                    {{ render(controller('LaurentPiaBundle:Pia:pirWidget', { 'user': user.getId() } )) }}
+                    {{ render(controller('FormaLibrePiaBundle:Pia:pirWidget', { 'user': user.getId() } )) }}
                 </div>
             </div>
             <div class="row">
                 <div class="panel panel-default piaWidget">
-                    {{ render(controller('LaurentBulletinBundle:Bulletin:bulletinWidget', { 'user': user.getId() } )) }}
+                    {{ render(controller('FormaLibreBulletinBundle:Bulletin:bulletinWidget', { 'user': user.getId() } )) }}
                 </div>
             </div>
             <div class="row">
@@ -37,7 +37,7 @@
                     <div class="panel panel-default piaWidget">
                         <div class="panel-heading">Présence</div>
                         <div class="panel-body">
-                            {{ render(controller('LaurentBulletinBundle:Bulletin:bulletinPresenceWidget', { 'user': user.getId() } )) }}
+                            {{ render(controller('FormaLibreBulletinBundle:Bulletin:bulletinPresenceWidget', { 'user': user.getId() } )) }}
                         </div>
                     </div>
                 </div>
@@ -45,7 +45,7 @@
                     <div class="panel panel-default piaWidget">
                         <div class="panel-heading">Comportement</div>
                         <div class="panel-body">
-                            {{ render(controller('LaurentBulletinBundle:Bulletin:bulletinComportementWidget', { 'user': user.getId() } )) }}
+                            {{ render(controller('FormaLibreBulletinBundle:Bulletin:bulletinComportementWidget', { 'user': user.getId() } )) }}
                         </div>
                     </div>
                 </div>
@@ -115,7 +115,7 @@
                         Points divers
                     </div>
                     <div class="panel-body">
-                        {{ render(controller('LaurentBulletinBundle:Bulletin:bulletinPointsDiversWidget', { 'user': user.getId() } )) }}
+                        {{ render(controller('FormaLibreBulletinBundle:Bulletin:bulletinPointsDiversWidget', { 'user': user.getId() } )) }}
                     </div>
                 </div>
             </div>
@@ -138,13 +138,13 @@
 
 {% block stylesheets %}
     {{ parent() }}
-    <link rel="stylesheet" href="{{ asset('bundles/laurentpia/css/piaFiche.css')}}"/>
+    <link rel="stylesheet" href="{{ asset('bundles/formalibrepia/css/piaFiche.css')}}"/>
 {% endblock %}
 
 {% block javascripts %}
     {{ parent() }}
     <script
-            src='{{ asset('bundles/laurentpia/js/fiche.js') }}'
+            src='{{ asset('bundles/formalibrepia/js/fiche.js') }}'
             type="text/javascript">
     </script>
 {% endblock %}

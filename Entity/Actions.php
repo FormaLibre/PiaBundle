@@ -1,12 +1,12 @@
 <?php
 
-namespace Laurent\PiaBundle\Entity;
+namespace FormaLibre\PiaBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="laurent_pia_action")
+ * @ORM\Table(name="formalibre_pia_action")
  */
 class Actions
 {
@@ -33,7 +33,7 @@ class Actions
      *     cascade={"persist"}
      * )
      * @ORM\JoinColumn(onDelete="CASCADE", nullable=true)
-     * @ORM\joinTable(name="laurent_pia_action_user")
+     * @ORM\joinTable(name="formalibre_pia_action_user")
      */
     private $intervenantPossible;
 

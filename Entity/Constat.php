@@ -1,6 +1,6 @@
 <?php
 
-namespace Laurent\PiaBundle\Entity;
+namespace FormaLibre\PiaBundle\Entity;
 
 use Claroline\CoreBundle\Entity\User;
 use Doctrine\ORM\Mapping as ORM;
@@ -8,7 +8,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="laurent_pia_constat")
+ * @ORM\Table(name="formalibre_pia_constat")
  */
 class Constat
 {

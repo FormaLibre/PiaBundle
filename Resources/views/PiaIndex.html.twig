@@ -9,12 +9,12 @@
         {% for group in groups %}
             <tr>
                 <td>
-                    <a href="{{ path ('laurentPiaCdc', {'group' : group.id()}) }}">
+                    <a href="{{ path ('formalibrePiaCdc', {'group' : group.id()}) }}">
                         {{ group.Name() }}
                     </a> 
                 </td>
                 <td>
-                    <a href="{{ path('laurentPiaGroupFichePrint', {'group': group.getId()}) }}">
+                    <a href="{{ path('formalibrePiaGroupFichePrint', {'group': group.getId()}) }}">
                         Imprimer la classe
                     </a> 
                 </td>

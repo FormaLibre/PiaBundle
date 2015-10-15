@@ -1,6 +1,6 @@
 <?php
 
-namespace Laurent\PiaBundle\Form;
+namespace FormaLibre\PiaBundle\Form;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -33,7 +33,7 @@ class ActionType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'Laurent\PiaBundle\Entity\Actions'
+            'data_class' => 'FormaLibre\PiaBundle\Entity\Actions'
         ));
     }
 

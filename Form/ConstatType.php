@@ -1,6 +1,6 @@
 <?php
 
-namespace Laurent\PiaBundle\Form;
+namespace FormaLibre\PiaBundle\Form;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;

@@ -1,78 +1,79 @@
 <?php
-namespace Laurent\PiaBundle\Controller;
 
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration as EXT;
-use JMS\DiExtraBundle\Annotation as DI;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Doctrine\ORM\EntityManager;
-use Claroline\CoreBundle\Persistence\ObjectManager;
+namespace FormaLibre\PiaBundle\Controller;
 
 use Claroline\CoreBundle\Entity\User;
-use Claroline\CoreBundle\Entity\Group;
-use Laurent\PiaBundle\Entity\Suivis;
-use Laurent\PiaBundle\Entity\Actions;
-use Laurent\PiaBundle\Entity\Taches;
-use Laurent\PiaBundle\Form\TacheType;
-use Laurent\PiaBundle\Form\SuiviType;
-use Laurent\PiaBundle\Form\ActionType;
+use Claroline\CoreBundle\Persistence\ObjectManager;
+use Doctrine\ORM\EntityManager;
+use FormaLibre\BulletinBundle\Manager\BulletinManager;
+use FormaLibre\PiaBundle\Entity\Taches;
+use FormaLibre\PiaBundle\Form\TacheType;
+use JMS\DiExtraBundle\Annotation as DI;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration as EXT;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class PiaTacheController extends Controller
 {
     private $authorization;
+    private $bulletinManager;
     private $em;
     private $om;
-    /** @var tachesRepository */
-    private $tachesRepo;
-    /** @var suivisRepository */
-    private $suivisRepo;
+
     /** @var actionsRepository */
     private $actionsRepo;
-
+    /** @var suivisRepository */
+    private $suivisRepo;
+    /** @var tachesRepository */
+    private $tachesRepo;
 
     /**
      * @DI\InjectParams({
-     *      "authorization"      = @DI\Inject("security.authorization_checker"),
-     *      "em"                 = @DI\Inject("doctrine.orm.entity_manager"),
-     *      "om"                 = @DI\Inject("claroline.persistence.object_manager"),
+     *      "authorization"   = @DI\Inject("security.authorization_checker"),
+     *      "bulletinManager" = @DI\Inject("formalibre.manager.bulletin_manager"),
+     *      "em"              = @DI\Inject("doctrine.orm.entity_manager"),
+     *      "om"              = @DI\Inject("claroline.persistence.object_manager")
      * })
      */
 
     public function __construct(
         AuthorizationCheckerInterface $authorization,
+        BulletinManager $bulletinManager,
         EntityManager $em,
         ObjectManager $om
     )
     {
-        $this->authorization      = $authorization;
-        $this->em                 = $em;
-        $this->om                 = $om;
-        $this->tachesRepo         = $om->getRepository('LaurentPiaBundle:Taches');
-        $this->suivisRepo         = $om->getRepository('LaurentPiaBundle:Suivis');
-        $this->actionsRepo        = $om->getRepository('LaurentPiaBundle:Actions');
+        $this->authorization = $authorization;
+        $this->bulletinManager = $bulletinManager;
+        $this->em = $em;
+        $this->om = $om;
 
+        $this->actionsRepo = $om->getRepository('FormaLibrePiaBundle:Actions');
+        $this->suivisRepo = $om->getRepository('FormaLibrePiaBundle:Suivis');
+        $this->tachesRepo = $om->getRepository('FormaLibrePiaBundle:Taches');
     }
 
     /**
-     * @EXT\Route("/", name="laurentPiaIndex")
+     * @EXT\Route("/", name="formalibrePiaIndex")
      */
     public function indexAction()
     {
-        $classes = $this->classeRepo->findAll();
-        foreach ($classes as $classe){
-            $groups[] = $classe->getGroup();
-        }
-        return $this->render('LaurentPiaBundle::PiaIndex.html.twig', array('groups' => $groups));
+        $groups = $this->bulletinManager->getTaggedGroups();
+
+        return $this->render(
+            'FormaLibrePiaBundle::PiaIndex.html.twig',
+            array('groups' => $groups)
+        );
     }
 
 
     /**
-     * @EXT\Route("/tache/add/{user}", name="laurentPiaTacheAdd", options = {"expose"=true})
+     * @EXT\Route("/tache/add/{user}", name="formalibrePiaTacheAdd", options = {"expose"=true})
      *
-     * @EXT\Template("LaurentPiaBundle::TacheForm.html.twig")
+     * @EXT\Template("FormaLibrePiaBundle::TacheForm.html.twig")
      */
     public function PiaTacheAddAction(Request $request, User $user)
     {
@@ -90,13 +91,13 @@ class PiaTacheController extends Controller
             }
             return new Response('success', 202);
         }
-        return array('form' => $form->createView(), 'action' => $this->generateUrl('laurentPiaTacheAdd', array('user'=>$user->getId())));
+        return array('form' => $form->createView(), 'action' => $this->generateUrl('formalibrePiaTacheAdd', array('user'=>$user->getId())));
     }
 
     /**
-     * @EXT\Route("/tache/{tache}/edit", name="laurentPiaTacheEdit", options = {"expose"=true})
+     * @EXT\Route("/tache/{tache}/edit", name="formalibrePiaTacheEdit", options = {"expose"=true})
      *
-     * @EXT\Template("LaurentPiaBundle::TacheForm.html.twig")
+     * @EXT\Template("FormaLibrePiaBundle::TacheForm.html.twig")
      */
     public function PiaTacheEditAction(Request $request, Taches $tache)
     {
@@ -113,11 +114,11 @@ class PiaTacheController extends Controller
             return new Response('success', 202);
         }
 
-        return array('form' => $form->createView(), 'action' => $this->generateUrl('laurentPiaTacheEdit', array('tache'=>$tache->getId())));
+        return array('form' => $form->createView(), 'action' => $this->generateUrl('formalibrePiaTacheEdit', array('tache'=>$tache->getId())));
     }
 
     /**
-     * @EXT\Route("/tache/{tache}/delete", name="laurentPiaTacheDelete", options = {"expose"=true})
+     * @EXT\Route("/tache/{tache}/delete", name="formalibrePiaTacheDelete", options = {"expose"=true})
      *
      */
     public function PiaTacheDeleteAction(Request $request, Taches $tache)
@@ -130,7 +131,7 @@ class PiaTacheController extends Controller
     }
 
     /**
-     * @EXT\Route("/tache/{tache}/close", name="laurentPiaTacheClose", options = {"expose"=true})
+     * @EXT\Route("/tache/{tache}/close", name="formalibrePiaTacheClose", options = {"expose"=true})
      *
      */
     public function PiaTacheCloseAction(Request $request, Taches $tache)

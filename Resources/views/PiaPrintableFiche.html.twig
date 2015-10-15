@@ -3,11 +3,11 @@
 <head>
     <meta charset="utf-8">
     <title>Récapitulatif P.I.A.</title>
-    <link rel="stylesheet" href="{{ asset('bundles/laurentbulletin/css/bootstrap.css')}}"/>
-    <link rel="stylesheet" href="{{ asset('bundles/laurentbulletin/css/bulletin.css')}}"/>
-    <link rel="stylesheet" href="{{ asset('bundles/laurentpia/css/piaFiche.css')}}"/>
+    <link rel="stylesheet" href="{{ asset('bundles/formalibrebulletin/css/bootstrap.css')}}"/>
+    <link rel="stylesheet" href="{{ asset('bundles/formalibrebulletin/css/bulletin.css')}}"/>
+    <link rel="stylesheet" href="{{ asset('bundles/formalibrepia/css/piaFiche.css')}}"/>
     <script type="text/javascript" src='{{ asset('bundles/frontend/jquery/jquery-2.1.0.min.js') }}'></script>
-    <script type="text/javascript" src='{{ asset('bundles/laurentbulletin/js/bootstrap.js') }}'></script>
+    <script type="text/javascript" src='{{ asset('bundles/formalibrebulletin/js/bootstrap.js') }}'></script>
 </head>
 
 <body>
@@ -26,10 +26,10 @@
             </div>
         </div>
         <div class="row">
-            {{ render(controller('LaurentBulletinBundle:Bulletin:printableBulletinWidget', { 'user': user.getId() } )) }}
+            {{ render(controller('FormaLibreBulletinBundle:Bulletin:printableBulletinWidget', { 'user': user.getId() } )) }}
         </div>
         <div class="row">
-            {{ render(controller('LaurentBulletinBundle:Bulletin:printableBulletinPointsDiversWidget', { 'user': user.getId() } )) }}
+            {{ render(controller('FormaLibreBulletinBundle:Bulletin:printableBulletinPointsDiversWidget', { 'user': user.getId() } )) }}
         </div>
         <h3 class="text-center">Conseil</h3>
         <hr style="border-color: #a3a3a3; width: 80%">

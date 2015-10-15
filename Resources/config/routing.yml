@@ -1,11 +1,11 @@
-laurent_pia_controller:
-    resource: "@LaurentPiaBundle/Controller/PiaController.php"
+formalibre_pia_controller:
+    resource: "@FormaLibrePiaBundle/Controller/PiaController.php"
     type:     annotation
 
-laurent_pia_tache_controller:
-    resource: "@LaurentPiaBundle/Controller/PiaTacheController.php"
+formalibre_pia_tache_controller:
+    resource: "@FormaLibrePiaBundle/Controller/PiaTacheController.php"
     type:     annotation
 
-laurent_pia_action_controller:
-    resource: "@LaurentPiaBundle/Controller/PiaActionController.php"
+formalibre_pia_action_controller:
+    resource: "@FormaLibrePiaBundle/Controller/PiaActionController.php"
     type:     annotation

@@ -2,7 +2,7 @@
 
 {% block section_content %}
     <div class="panel-heading">
-        <a href="{{ path('laurentPiaGroupFichePrint', {'group': group.getId()}) }}" class="pull-right">
+        <a href="{{ path('formalibrePiaGroupFichePrint', {'group': group.getId()}) }}" class="pull-right">
             <i class="fa fa-print"></i>
         </a>
         <h1>Élèves du group {{ group.getName() }}</h1>
@@ -11,7 +11,7 @@
         <table class="table">
         {% for eleve in eleves %}
             <tr>
-                <td><a href="{{ path ('laurentPiaFiche', {'user' : eleve.id()}) }}">{{ eleve.getFirstName() }} {{ eleve.getLastName() }}</a> </td>
+                <td><a href="{{ path ('formalibrePiaFiche', {'user' : eleve.id()}) }}">{{ eleve.getFirstName() }} {{ eleve.getLastName() }}</a> </td>
 
             </tr>
         {% endfor %}

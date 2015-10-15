@@ -17,7 +17,7 @@ $('.addTache').on('click', function (event) {
     userId = $(event.target).attr('data-user-id')
     $.ajax({
         url: Routing.generate(
-            'laurentPiaTacheAdd', {'user':userId}
+            'formalibrePiaTacheAdd', {'user':userId}
         ),
         type: 'GET',
         success: function(datas, textStatus, jqXHR) {
@@ -42,7 +42,7 @@ $('.viewSuivi').on('click', function (event) {
     tacheId = $(event.target).attr('data-tache-id')
     $.ajax({
         url: Routing.generate(
-            'laurentPiaSuivi', {'tache':tacheId}
+            'formalibrePiaSuivi', {'tache':tacheId}
         ),
         type: 'GET',
         success: function (datas) {
@@ -59,7 +59,7 @@ $('.closeTache').on('click', function (event) {
     tacheId = $(event.target).attr('data-tache-id')
     $.ajax({
         url: Routing.generate(
-            'laurentPiaTacheClose', {'tache':tacheId}
+            'formalibrePiaTacheClose', {'tache':tacheId}
         ),
         type: 'GET',
         success: function(datas, textStatus, jqXHR) {
@@ -80,7 +80,7 @@ $('.deleteTache').on('click', function (event) {
     tacheId = $(event.target).attr('data-tache-id')
     $.ajax({
         url: Routing.generate(
-            'laurentPiaTacheDelete', {'tache':tacheId}
+            'formalibrePiaTacheDelete', {'tache':tacheId}
         ),
         type: 'GET',
         success: function(datas, textStatus, jqXHR) {
@@ -101,7 +101,7 @@ $('.editTache').on('click', function (event) {
     tacheId = $(event.target).attr('data-tache-id')
     $.ajax({
         url: Routing.generate(
-            'laurentPiaTacheEdit', {'tache':tacheId}
+            'formalibrePiaTacheEdit', {'tache':tacheId}
         ),
         type: 'GET',
         success: function(datas, textStatus, jqXHR) {
@@ -125,7 +125,7 @@ $('.editPeriodeBtn').on('click', function (event) {
     var periodeId = $(event.currentTarget).data('periode-id');
     $.ajax({
         url: Routing.generate(
-            'laurentBulletinPeriodeEdit', {'periode': periodeId}
+            'formalibreBulletinPeriodeEdit', {'periode': periodeId}
         ),
         type: 'GET',
         success: function (datas) {
@@ -164,7 +164,7 @@ $('#constat-create-btn').on('click', function () {
         
     window.Claroline.Modal.displayForm(
         Routing.generate(
-            'laurentPiaConstatCreateForm',
+            'formalibrePiaConstatCreateForm',
             {'user': userId}
         ),
         addConstat,
@@ -177,7 +177,7 @@ $('#constat-body-box').on('click', '.edit-constat-btn', function () {
         
     window.Claroline.Modal.displayForm(
         Routing.generate(
-            'laurentPiaConstatEditForm',
+            'formalibrePiaConstatEditForm',
             {'constat': constatId}
         ),
         editConstat,
@@ -190,7 +190,7 @@ $('#constat-body-box').on('click', '.delete-constat-btn', function () {
 
     window.Claroline.Modal.confirmRequest(
         Routing.generate(
-            'laurentPiaConstatDelete',
+            'formalibrePiaConstatDelete',
             {'constat': constatId}
         ),
         removeConstat,

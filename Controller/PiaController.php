@@ -1,31 +1,39 @@
 <?php
-namespace Laurent\PiaBundle\Controller;
 
+namespace FormaLibre\PiaBundle\Controller;
+
+use Claroline\CoreBundle\Entity\Group;
+use Claroline\CoreBundle\Entity\User;
+use Claroline\CoreBundle\Persistence\ObjectManager;
+use FormaLibre\BulletinBundle\Manager\BulletinManager;
+use FormaLibre\BulletinBundle\Manager\TotauxManager;
+use FormaLibre\PiaBundle\Entity\Constat;
+use FormaLibre\PiaBundle\Entity\Suivis;
+use FormaLibre\PiaBundle\Entity\Taches;
+use FormaLibre\PiaBundle\Form\ConstatType;
+use FormaLibre\PiaBundle\Form\SuiviType;
+use JMS\DiExtraBundle\Annotation as DI;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration as EXT;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration as EXT;
-use JMS\DiExtraBundle\Annotation as DI;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Claroline\CoreBundle\Persistence\ObjectManager;
-use Symfony\Component\Form\FormFactory;
-
-use Claroline\CoreBundle\Entity\User;
-use Claroline\CoreBundle\Entity\Group;
-use Laurent\PiaBundle\Entity\Suivis;
-use Laurent\PiaBundle\Entity\Constat;
-use Laurent\PiaBundle\Entity\Taches;
-use Laurent\PiaBundle\Form\SuiviType;
-use Laurent\PiaBundle\Form\ConstatType;
-use Laurent\BulletinBundle\Manager\TotauxManager;
 
 class PiaController extends Controller
 {
     private $authorization;
+    private $bulletinManager;
+    private $formFactory;
     private $om;
+    /** @var  string */
+    private $pdfDir;
+    private $request;
+    private $totauxManager;
+
     /** @var tachesRepository */
     private $tachesRepo;
     /** @var suivisRepository */
@@ -33,62 +41,60 @@ class PiaController extends Controller
     /** @var actionsRepository */
     private $actionsRepo;
     private $constatRepo;
-    private $classeRepo;
     private $userRepo;
-    private $totauxManager;
-    private $formFactory;
-    private $request;
-    /** @var  string */
-    private $pdfDir;
 
     /**
      * @DI\InjectParams({
-     *      "authorization"      = @DI\Inject("security.authorization_checker"),
-     *      "om"                 = @DI\Inject("claroline.persistence.object_manager"),
-     *      "totauxManager"      = @DI\Inject("laurent.manager.totaux_manager"),
-     *      "formFactory"        = @DI\Inject("form.factory"),
-     *      "requestStack"       = @DI\Inject("request_stack"),
-     *      "pdfDir"             = @DI\Inject("%laurent.directories.pdf%")
+     *      "authorization"   = @DI\Inject("security.authorization_checker"),
+     *      "bulletinManager" = @DI\Inject("formalibre.manager.bulletin_manager"),
+     *      "formFactory"     = @DI\Inject("form.factory"),
+     *      "om"              = @DI\Inject("claroline.persistence.object_manager"),
+     *      "pdfDir"          = @DI\Inject("%formalibre.directories.pdf%"),
+     *      "requestStack"    = @DI\Inject("request_stack"),
+     *      "totauxManager"   = @DI\Inject("formalibre.manager.totaux_manager")
      * })
      */
 
     public function __construct(
         AuthorizationCheckerInterface $authorization,
-        ObjectManager $om,
-        TotauxManager $totauxManager,
+        BulletinManager $bulletinManager,
         FormFactory $formFactory,
+        ObjectManager $om,
+        $pdfDir,
         RequestStack $requestStack,
-        $pdfDir
+        TotauxManager $totauxManager
     )
     {
-        $this->authorization      = $authorization;
-        $this->om                 = $om;
-        $this->tachesRepo         = $om->getRepository('LaurentPiaBundle:Taches');
-        $this->suivisRepo         = $om->getRepository('LaurentPiaBundle:Suivis');
-        $this->actionsRepo        = $om->getRepository('LaurentPiaBundle:Actions');
-        $this->constatRepo        = $om->getRepository('LaurentPiaBundle:Constat');
-        $this->classeRepo         = $om->getRepository('LaurentSchoolBundle:Classe');
-        $this->userRepo           = $om->getRepository('ClarolineCoreBundle:User');
-        $this->totauxManager      = $totauxManager;
-        $this->formFactory        = $formFactory;
-        $this->request            = $requestStack->getCurrentRequest();
-        $this->pdfDir             = $pdfDir;
+        $this->authorization = $authorization;
+        $this->bulletinManager = $bulletinManager;
+        $this->formFactory = $formFactory;
+        $this->om = $om;
+        $this->pdfDir = $pdfDir;
+        $this->request = $requestStack->getCurrentRequest();
+        $this->totauxManager = $totauxManager;
+
+        $this->tachesRepo = $om->getRepository('FormaLibrePiaBundle:Taches');
+        $this->suivisRepo = $om->getRepository('FormaLibrePiaBundle:Suivis');
+        $this->actionsRepo = $om->getRepository('FormaLibrePiaBundle:Actions');
+        $this->constatRepo = $om->getRepository('FormaLibrePiaBundle:Constat');
+        $this->userRepo = $om->getRepository('ClarolineCoreBundle:User');
     }
 
     /**
-     * @EXT\Route("/", name="laurentPiaIndex")
+     * @EXT\Route("/", name="formalibrePiaIndex")
      */
     public function indexAction()
     {
-        $classes = $this->classeRepo->findAll();
-        foreach ($classes as $classe){
-            $groups[] = $classe->getGroup();
-        }
-        return $this->render('LaurentPiaBundle::PiaIndex.html.twig', array('groups' => $groups));
+        $groups = $this->bulletinManager->getTaggedGroups();
+
+        return $this->render(
+            'FormaLibrePiaBundle::PiaIndex.html.twig',
+            array('groups' => $groups)
+        );
     }
 
     /**
-     * @EXT\Route("/group/{group}/cdc/", name="laurentPiaCdc")
+     * @EXT\Route("/group/{group}/cdc/", name="formalibrePiaCdc")
      *
      * @param Group $group
      *
@@ -117,11 +123,11 @@ class PiaController extends Controller
 
         $params = array('group' => $group, 'eleves' => $sorted);
 
-        return $this->render('LaurentPiaBundle::PiaCdc.html.twig', $params);
+        return $this->render('FormaLibrePiaBundle::PiaCdc.html.twig', $params);
     }
 
     /**
-     * @EXT\Route("/user/{user}/fiche/", name="laurentPiaFiche")
+     * @EXT\Route("/user/{user}/fiche/", name="formalibrePiaFiche")
      *
      * @param User $user
      *
@@ -133,13 +139,13 @@ class PiaController extends Controller
 
         $params = array('user' => $user, 'constats' => $constats);
 
-        return $this->render('LaurentPiaBundle::PiaFiche.html.twig', $params);
+        return $this->render('FormaLibrePiaBundle::PiaFiche.html.twig', $params);
     }
 
     /**
      * @EXT\Route(
      *     "/user/{user}/printable/fiche/print",
-     *     name="laurentPiaFichePrint"
+     *     name="formalibrePiaFichePrint"
      * )
      *
      * @param User $user
@@ -151,7 +157,7 @@ class PiaController extends Controller
         $filename = $user->getLastName() . $user->getFirstName(). '-PIA-'. date("Y-m-d-H-i-s") . '.pdf';
         $dir = $this->pdfDir . 'PIA/' . $filename;
 
-        $eleveUrl = $this->generateUrl('laurentPiaPrintableFiche', array('user' => $user->getId()), true);
+        $eleveUrl = $this->generateUrl('formalibrePiaPrintableFiche', array('user' => $user->getId()), true);
         $this->get('knp_snappy.pdf')->generate($eleveUrl, $dir);
 
         $headers = array(
@@ -165,7 +171,7 @@ class PiaController extends Controller
     /**
      * @EXT\Route(
      *     "/group/{group}/printable/fiche/print",
-     *     name="laurentPiaGroupFichePrint",
+     *     name="formalibrePiaGroupFichePrint",
      *     options = {"expose"=true}
      * )
      *
@@ -181,7 +187,7 @@ class PiaController extends Controller
         $elevesUrl = array();
 
         foreach ($eleves as $eleve){
-            $elevesUrl[] = $this->generateUrl('laurentPiaPrintableFiche', array('user' => $eleve->getId()), true);
+            $elevesUrl[] = $this->generateUrl('formalibrePiaPrintableFiche', array('user' => $eleve->getId()), true);
         }
         $this->get('knp_snappy.pdf')->generate($elevesUrl, $dir);
 
@@ -196,7 +202,7 @@ class PiaController extends Controller
     /**
      * @EXT\Route(
      *     "/user/{user}/printable/fiche/",
-     *     name="laurentPiaPrintableFiche"
+     *     name="formalibrePiaPrintableFiche"
      * )
      *
      * @param User $user
@@ -210,11 +216,11 @@ class PiaController extends Controller
 
         $params = array('user' => $user, 'constats' => $constats);
 
-        return $this->render('LaurentPiaBundle::PiaPrintableFiche.html.twig', $params);
+        return $this->render('FormaLibrePiaBundle::PiaPrintableFiche.html.twig', $params);
     }
 
     /**
-     * @EXT\Route("/user/{user}/pirWidget/", name="laurentPiaPirWidget")
+     * @EXT\Route("/user/{user}/pirWidget/", name="formalibrePiaPirWidget")
      *
      * @param User $user
      *
@@ -227,12 +233,12 @@ class PiaController extends Controller
 
         $params = array('user' => $user, 'taches' => $taches);
 
-        return $this->render('LaurentPiaBundle::PirWidget.html.twig', $params);
+        return $this->render('FormaLibrePiaBundle::PirWidget.html.twig', $params);
     }
 
 
     /**
-     * @EXT\Route("/tache/{tache}/suivi/", name="laurentPiaSuivi", options = {"expose"=true})
+     * @EXT\Route("/tache/{tache}/suivi/", name="formalibrePiaSuivi", options = {"expose"=true})
      *
      * @param Taches $tache
      *
@@ -259,18 +265,18 @@ class PiaController extends Controller
             }
 
             $user = $tache->getEleves();
-            return $this->render('LaurentPiaBundle::PiaFiche.html.twig', array('user' => $user));
+            return $this->render('FormaLibrePiaBundle::PiaFiche.html.twig', array('user' => $user));
         }
 
         $params = array('tache' => $tache, 'suivis' => $suivi, 'form' =>  $form->createView());
 
-        return $this->render('LaurentPiaBundle::suiviWidget.html.twig', $params);
+        return $this->render('FormaLibrePiaBundle::suiviWidget.html.twig', $params);
     }
 
     /**
      * @EXT\Route(
      *     "constat/user/{user}/create/form",
-     *     name="laurentPiaConstatCreateForm",
+     *     name="formalibrePiaConstatCreateForm",
      *     options={"expose"=true}
      * )
      * @EXT\ParamConverter("authenticatedUser", options={"authenticatedUser" = true})
@@ -285,13 +291,13 @@ class PiaController extends Controller
             'user' => $user
         );
 
-        return $this->render('LaurentPiaBundle::constatCreateModalForm.html.twig', $params);
+        return $this->render('FormaLibrePiaBundle::constatCreateModalForm.html.twig', $params);
     }
 
     /**
      * @EXT\Route(
      *     "constat/user/{user}/create",
-     *     name="laurentPiaConstatCreate",
+     *     name="formalibrePiaConstatCreate",
      *     options={"expose"=true}
      * )
      * @EXT\ParamConverter("authenticatedUser", options={"authenticatedUser" = true})
@@ -321,14 +327,14 @@ class PiaController extends Controller
                 'user' => $user
             );
 
-            return $this->render('LaurentPiaBundle::constatCreateModalForm.html.twig', $params);
+            return $this->render('FormaLibrePiaBundle::constatCreateModalForm.html.twig', $params);
         }
     }
 
     /**
      * @EXT\Route(
      *     "constat/{constat}/edit/form",
-     *     name="laurentPiaConstatEditForm",
+     *     name="formalibrePiaConstatEditForm",
      *     options={"expose"=true}
      * )
      * @EXT\ParamConverter("authenticatedUser", options={"authenticatedUser" = true})
@@ -343,13 +349,13 @@ class PiaController extends Controller
             'constat' => $constat
         );
 
-        return $this->render('LaurentPiaBundle::constatEditModalForm.html.twig', $params);
+        return $this->render('FormaLibrePiaBundle::constatEditModalForm.html.twig', $params);
     }
 
     /**
      * @EXT\Route(
      *     "constat/{constat}/edit",
-     *     name="laurentPiaConstatEdit",
+     *     name="formalibrePiaConstatEdit",
      *     options={"expose"=true}
      * )
      * @EXT\ParamConverter("authenticatedUser", options={"authenticatedUser" = true})
@@ -378,14 +384,14 @@ class PiaController extends Controller
                 'constat' => $constat
             );
 
-            return $this->render('LaurentPiaBundle::constatEditModalForm.html.twig', $params);
+            return $this->render('FormaLibrePiaBundle::constatEditModalForm.html.twig', $params);
         }
     }
 
     /**
      * @EXT\Route(
      *     "constat/{constat}/delete",
-     *     name="laurentPiaConstatDelete",
+     *     name="formalibrePiaConstatDelete",
      *     options={"expose"=true}
      * )
      * @EXT\ParamConverter("authenticatedUser", options={"authenticatedUser" = true})

@@ -1,12 +1,12 @@
 <?php
 
-namespace Laurent\PiaBundle\Entity;
+namespace FormaLibre\PiaBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="laurent_pia_taches")
+ * @ORM\Table(name="formalibre_pia_taches")
  */
 class Taches
 {
@@ -19,7 +19,7 @@ class Taches
 
     /**
      * @ORM\ManyToOne(
-     *     targetEntity="Laurent\PiaBundle\Entity\Actions",
+     *     targetEntity="FormaLibre\PiaBundle\Entity\Actions",
      *     cascade={"persist"}
      * )
      */
@@ -57,7 +57,7 @@ class Taches
      *     cascade={"persist"}
      * )
      * @ORM\JoinColumn(onDelete="CASCADE", nullable=true)
-     * @ORM\joinTable(name="laurent_pia_taches_user")
+     * @ORM\joinTable(name="formalibre_pia_taches_user")
      */
     private $intervenant;
 
