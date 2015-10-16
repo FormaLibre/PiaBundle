@@ -1,0 +1,17 @@
+{% if datas|length > 0 %}
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            
+            {% for data in datas %}
+                <tr>
+                    <td {% if data['percentage'] < 50 %}style="background-color: #F74747"{% endif %}>
+                        {{ data['session'].getCourse().getTitle() }}
+                    </td>
+                    <td {% if data['percentage'] < 50 %}style="background-color: #F74747"{% endif %}>
+                        {{ data['percentage'] }} %
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+{% endif %}

@@ -34,15 +34,15 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-xs-6">
+                    <div class="col-xs-12">
                         <div class="panel panel-default piaWidget">
                             <div class="panel-heading">Présence</div>
                             <div class="panel-body">
-                                {{ render(controller('FormaLibreBulletinBundle:Bulletin:bulletinPresenceWidget', { 'user': user.getId() } )) }}
+                                {{ render(controller('FormaLibrePiaBundle:Pia:piaPresencesWidget', { 'user': user.getId() } )) }}
                             </div>
                         </div>
                     </div>
-                    <div class="col-xs-6">
+                    <div class="col-xs-12">
                         <div class="panel panel-default piaWidget">
                             <div class="panel-heading">Comportement</div>
                             <div class="panel-body">

@@ -6,6 +6,8 @@ use Claroline\CoreBundle\Entity\Facet\FieldFacet;
 use Claroline\CoreBundle\Entity\Group;
 use Claroline\CoreBundle\Entity\User;
 use Claroline\CoreBundle\Persistence\ObjectManager;
+use Claroline\CursusBundle\Entity\CourseSession;
+use Claroline\CursusBundle\Manager\CursusManager;
 use FormaLibre\BulletinBundle\Manager\BulletinManager;
 use FormaLibre\BulletinBundle\Manager\TotauxManager;
 use FormaLibre\PiaBundle\Entity\Constat;
@@ -14,6 +16,7 @@ use FormaLibre\PiaBundle\Entity\Taches;
 use FormaLibre\PiaBundle\Form\ConstatType;
 use FormaLibre\PiaBundle\Form\SuiviType;
 use FormaLibre\PiaBundle\Manager\PiaManager;
+use FormaLibre\PresenceBundle\Manager\PresenceManager;
 use JMS\DiExtraBundle\Annotation as DI;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration as EXT;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -29,11 +32,13 @@ class PiaController extends Controller
 {
     private $authorization;
     private $bulletinManager;
+    private $cursusManager;
     private $formFactory;
     private $om;
     /** @var  string */
     private $pdfDir;
     private $piaManager;
+    private $presenceManager;
     private $request;
     private $totauxManager;
 
@@ -48,34 +53,40 @@ class PiaController extends Controller
 
     /**
      * @DI\InjectParams({
-     *      "authorization"   = @DI\Inject("security.authorization_checker"),
-     *      "bulletinManager" = @DI\Inject("formalibre.manager.bulletin_manager"),
-     *      "formFactory"     = @DI\Inject("form.factory"),
-     *      "om"              = @DI\Inject("claroline.persistence.object_manager"),
-     *      "pdfDir"          = @DI\Inject("%formalibre.directories.pdf%"),
-     *      "piaManager"      = @DI\Inject("formalibre.manager.pia_manager"),
-     *      "requestStack"    = @DI\Inject("request_stack"),
-     *      "totauxManager"   = @DI\Inject("formalibre.manager.totaux_manager")
+     *     "authorization"   = @DI\Inject("security.authorization_checker"),
+     *     "cursusManager"   = @DI\Inject("claroline.manager.cursus_manager"),
+     *     "bulletinManager" = @DI\Inject("formalibre.manager.bulletin_manager"),
+     *     "formFactory"     = @DI\Inject("form.factory"),
+     *     "om"              = @DI\Inject("claroline.persistence.object_manager"),
+     *     "pdfDir"          = @DI\Inject("%formalibre.directories.pdf%"),
+     *     "piaManager"      = @DI\Inject("formalibre.manager.pia_manager"),
+     *     "presenceManager" = @DI\Inject("formalibre.manager.presence_manager"),
+     *     "requestStack"    = @DI\Inject("request_stack"),
+     *     "totauxManager"   = @DI\Inject("formalibre.manager.totaux_manager")
      * })
      */
 
     public function __construct(
         AuthorizationCheckerInterface $authorization,
         BulletinManager $bulletinManager,
+        CursusManager $cursusManager,
         FormFactory $formFactory,
         ObjectManager $om,
         $pdfDir,
         PiaManager $piaManager,
+        PresenceManager $presenceManager,
         RequestStack $requestStack,
         TotauxManager $totauxManager
     )
     {
         $this->authorization = $authorization;
         $this->bulletinManager = $bulletinManager;
+        $this->cursusManager = $cursusManager;
         $this->formFactory = $formFactory;
         $this->om = $om;
         $this->pdfDir = $pdfDir;
         $this->piaManager = $piaManager;
+        $this->presenceManager = $presenceManager;
         $this->request = $requestStack->getCurrentRequest();
         $this->totauxManager = $totauxManager;
 
@@ -466,6 +477,72 @@ class PiaController extends Controller
         }
 
         return array('facets' => $facets, 'panels' => $panels, 'fields' => $fields);
+    }
+
+    /**
+     * @EXT\Route(
+     *     "pia/user/{user}/presences/widget",
+     *     name="formalibre_pia_presences_widget",
+     *     defaults={"periodeId"=0},
+     *     options={"expose"=true}
+     * )
+     * @EXT\ParamConverter("authenticatedUser", options={"authenticatedUser" = true})
+     * @EXT\Template("FormaLibrePiaBundle::piaPresencesWidget.html.twig")
+     */
+    public function piaPresencesWidgetAction(User $user)
+    {
+        $this->checkOpen();
+        $datas = array();
+        $sessions = array();
+        $userSessions = $this->cursusManager->getSessionsByUserAndType($user);
+
+        foreach ($userSessions as $session) {
+
+            if ($session->getSessionStatus() !== CourseSession::SESSION_CLOSED) {
+                $sessions[] = $session;
+            }
+        }
+        $allPresences = $this->presenceManager
+            ->getPresencesByUserAndSessions($user, $sessions);
+        $presences = $this->presenceManager
+            ->getPresencesByUserAndSessionAndStatusName($user, $sessions, 'Présent');
+
+        $totalPresences = array();
+        $actualPresences = array();
+
+        foreach ($allPresences as $presence) {
+            $sessionId = $presence->getCourseSession()->getId();
+
+            if (!isset($totalPresences[$sessionId])) {
+                $totalPresences[$sessionId] = 0;
+            }
+            $totalPresences[$sessionId]++;
+        }
+
+        foreach ($presences as $presence) {
+            $sessionId = $presence->getCourseSession()->getId();
+
+            if (!isset($actualPresences[$sessionId])) {
+                $actualPresences[$sessionId] = 0;
+            }
+            $actualPresences[$sessionId]++;
+        }
+
+        foreach($sessions as $session) {
+            $sessionId = $session->getId();
+            $percentage = 0;
+
+            if (isset($totalPresences[$sessionId]) &&
+                isset($actualPresences[$sessionId]) &&
+                $totalPresences[$sessionId] > 0 &&
+                $actualPresences[$sessionId] > 0
+            ) {
+                $percentage = floor(($actualPresences[$sessionId] / $totalPresences[$sessionId]) * 100);
+            }
+            $datas[] = array('session' => $session, 'percentage' => $percentage);
+        }
+
+        return array('datas' => $datas);
     }
 
     private function checkOpen()
