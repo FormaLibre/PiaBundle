@@ -572,14 +572,10 @@ class PiaController extends Controller
         throw new AccessDeniedException();
     }
 
-    public function calculIndice(User $user){
+    public function calculIndice(User $user)
+    {
+        $allPoints = $this->bulletinManager->getAllUserPointsDatas($user);
 
-        $totauxMatieres = $this->totauxManager->getTotalPeriodes($user);
-        $i = 0;
-
-        foreach ($totauxMatieres as $total){
-            $i = 100 - $total;
-        }
-        return $i;
+        return $allPoints['finalPercentage'];
     }
 }
