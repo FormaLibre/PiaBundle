@@ -282,7 +282,8 @@ class PiaController extends Controller
             }
 
             $user = $tache->getEleves();
-            return $this->render('FormaLibrePiaBundle::PiaFiche.html.twig', array('user' => $user));
+            $constats = $this->constatRepo->findByUser($user, array('creationDate' => 'ASC'));
+            return $this->render('FormaLibrePiaBundle::PiaFiche.html.twig', array('user' => $user, 'constats' => $constats));
         }
 
         $params = array('tache' => $tache, 'suivis' => $suivi, 'form' =>  $form->createView());

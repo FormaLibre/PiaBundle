@@ -21,8 +21,8 @@
             {% else %}
                 <tr class="warning">
             {% endif %}
-                <td>{{ tache.action.getName() }} - {{ tache.titre }}</td>
-                <td>{{ tache.responsable.getLastName() }}</td>
+                <td>{% if tache.getAction() is not empty %}{{ tache.action.getName() }} - {% endif %}{{ tache.titre }}</td>
+                <td>{% if tache.getResponsable() is not empty %}{{ tache.responsable.getLastName() }}{% endif %}</td>
                 <td>{{ tache.commentaire|raw }}</td>
                 <td>
                     <i class="fa fa-search click viewSuivi" data-tache-id="{{ tache.getId() }}"></i>

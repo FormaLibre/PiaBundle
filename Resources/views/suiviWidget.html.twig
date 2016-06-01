@@ -1,6 +1,6 @@
 <div class="panel-heading">
     <div class="row">
-        <div class="col-xs-11">    <h3>Suivi {{ tache.action.getName() }} - {{ tache.titre }}</h3></div>
+        <div class="col-xs-11">    <h3>Suivi {% if tache.getAction() is not empty %}{{ tache.action.getName() }} - {% endif %}{{ tache.titre }}</h3></div>
         <div class="col-xs-1"></div>
     </div>
 
@@ -29,7 +29,7 @@
         {% for suivi in suivis %}
             <tr class="warning">
                 <td>{{ suivi.date|date('d/m/Y') }}</td>
-                <td>{{ suivi.intervenant.getUsername() }}</td>
+                <td>{% if suivi.getIntervenant() is not empty %}{{ suivi.intervenant.getLastName() }}{% endif %}</td>
                 <td>{{ suivi.description|raw }}</td>
                 <td><i class="fa fa-search click editSuivi" data-suivi-id="{{ suivi.getId() }}"></i></td>
             </tr>

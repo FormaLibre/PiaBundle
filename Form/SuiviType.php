@@ -29,14 +29,17 @@ class SuiviType extends AbstractType
                 ))
             ->add('description', 'text', array('required' => false, 'label' => 'Commentaire'))
             ->add('intervenant', 'entity', array(
-                'label' => 'responsable',
+                'label' => 'Intervenant',
                 'class' => 'Claroline\CoreBundle\Entity\User',
                 'query_builder' => function (UserRepository $userRepository) {
-                        $query = $userRepository->createQueryBuilder('u')
-                            ->join('u.groups', 'g', 'WITH', 'g.name = \'ProfD1\'');
-                        return $query;
-                    },
-                'property' => 'username'
+                    $query = $userRepository->createQueryBuilder('u')
+                        ->join('u.roles', 'r', 'WITH', 'r.name = \'ROLE_PROF\'')
+                        ->orderBy('u.lastName, u.firstName', 'ASC');
+                    return $query;
+                },
+                'placeholder' => '--- Veuillez choisir un intervenant ---',
+                'empty_data'  => null,
+                'required' => 'false'
             ))
             ->add('save', 'submit', array('label'=>'Ajouter','attr' => array('class' => 'btn btn-primary addSuivi')));
             ;

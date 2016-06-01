@@ -16,14 +16,17 @@ class TacheType extends AbstractType
             ->add('titre', 'text', array('label' => 'titre'))
             ->add('commentaire', 'tinymce', array('required' => false, 'label' => 'Commentaire'))
             ->add('responsable', 'entity', array(
-                'label' => 'responsable',
+                'label' => 'Responsable',
                 'class' => 'Claroline\CoreBundle\Entity\User',
                 'query_builder' => function (UserRepository $userRepository) {
-                        $query = $userRepository->createQueryBuilder('u')
-                            ->join('u.groups', 'g', 'WITH', 'g.name = \'ProfD1\'');
-                        return $query;
-                    },
-                'property' => 'username'
+                    $query = $userRepository->createQueryBuilder('u')
+                        ->join('u.roles', 'r', 'WITH', 'r.name = \'ROLE_PROF\'')
+                        ->orderBy('u.lastName, u.firstName', 'ASC');
+                    return $query;
+                },
+                'placeholder' => '--- Veuillez choisir un responsable ---',
+                'empty_data'  => null,
+                'required' => 'false'
             ))
             ->add('fini', 'checkbox', array('label'=>'Terminée'))
             ->add('priorite', 'number', array('label'=>'Priorite'))
