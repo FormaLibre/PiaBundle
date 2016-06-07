@@ -14,9 +14,9 @@
     ],
     "require": {
         "php": ">=5.5",
-        "claroline/core-bundle": "~6.0",
-        "formalibre/bulletin-bundle": "~6.0",
-        "formalibre/presence-bundle": "~6.0"
+        "claroline/distribution": "~7.0",
+        "formalibre/bulletin-bundle": "~7.0",
+        "formalibre/presence-bundle": "~7.0"
     },
     "autoload": {
         "psr-4": { "FormaLibre\\PiaBundle\\": "" }
