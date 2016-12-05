@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
+use Claroline\MessageBundle\Manager\MessageManager;
 use FormaLibre\PiaBundle\Form\ActionType;
 
 class PiaActionController extends Controller
@@ -19,6 +20,7 @@ class PiaActionController extends Controller
     private $authorization;
     private $em;
     private $om;
+    private $messageManager;
 
     /** @var actionsRepository */
     private $actionsRepo;
@@ -33,18 +35,21 @@ class PiaActionController extends Controller
      *      "authorization"      = @DI\Inject("security.authorization_checker"),
      *      "em"                 = @DI\Inject("doctrine.orm.entity_manager"),
      *      "om"                 = @DI\Inject("claroline.persistence.object_manager"),
+     *      "messageManager"     = @DI\Inject("claroline.manager.message_manager"),
      * })
      */
 
     public function __construct(
         AuthorizationCheckerInterface $authorization,
         EntityManager $em,
-        ObjectManager $om
+        ObjectManager $om,
+        MessageManager $messageManager
     )
     {
         $this->authorization = $authorization;
         $this->em = $em;
         $this->om = $om;
+        $this->messageManager = $messageManager;
 
         $this->actionsRepo = $om->getRepository('FormaLibrePiaBundle:Actions');
         $this->suivisRepo = $om->getRepository('FormaLibrePiaBundle:Suivis');

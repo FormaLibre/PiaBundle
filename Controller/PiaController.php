@@ -27,6 +27,9 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Claroline\MessageBundle\Manager\MessageManager;
+
+
 
 class PiaController extends Controller
 {
@@ -50,6 +53,7 @@ class PiaController extends Controller
     private $actionsRepo;
     private $constatRepo;
     private $userRepo;
+    private $messageManager;
 
     /**
      * @DI\InjectParams({
@@ -62,7 +66,8 @@ class PiaController extends Controller
      *     "piaManager"      = @DI\Inject("formalibre.manager.pia_manager"),
      *     "presenceManager" = @DI\Inject("formalibre.manager.presence_manager"),
      *     "requestStack"    = @DI\Inject("request_stack"),
-     *     "totauxManager"   = @DI\Inject("formalibre.manager.totaux_manager")
+     *     "totauxManager"   = @DI\Inject("formalibre.manager.totaux_manager"),
+     *     "messageManager"     = @DI\Inject("claroline.manager.message_manager")
      * })
      */
 
@@ -76,7 +81,8 @@ class PiaController extends Controller
         PiaManager $piaManager,
         PresenceManager $presenceManager,
         RequestStack $requestStack,
-        TotauxManager $totauxManager
+        TotauxManager $totauxManager,
+        MessageManager $messageManager
     )
     {
         $this->authorization = $authorization;
@@ -89,6 +95,7 @@ class PiaController extends Controller
         $this->presenceManager = $presenceManager;
         $this->request = $requestStack->getCurrentRequest();
         $this->totauxManager = $totauxManager;
+        $this->messageManager = $messageManager;
 
         $this->tachesRepo = $om->getRepository('FormaLibrePiaBundle:Taches');
         $this->suivisRepo = $om->getRepository('FormaLibrePiaBundle:Suivis');
@@ -276,6 +283,13 @@ class PiaController extends Controller
                 $suiviNew->setTaches($tache);
                 $this->om->persist($suiviNew);
                 $this->om->flush();
+                
+                $object="Nouveau suivi pour: ".$suiviNew->getTaches()->getEleves();
+                $content="Responsable de l'action: ".$suiviNew->getTaches()->getResponsable()."<br><br>Nouvelle intervention de ".$suiviNew->getIntervenant()." le ".$suiviNew->getDate()->format("d-m-Y")."<br><br>"."Détails: <br>".$suiviNew->getDescription();
+                $users=[$suiviNew->getIntervenant()];
+                $message=$this->messageManager->create($content, $object,$users);
+                $this->messageManager->send($message);
+                    
             } else {
                 $errors = $form->getErrorsAsString();
                 var_dump($errors);

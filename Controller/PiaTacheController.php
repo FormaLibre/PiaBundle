@@ -16,12 +16,15 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
+use Claroline\MessageBundle\Manager\MessageManager;
+
 class PiaTacheController extends Controller
 {
     private $authorization;
     private $bulletinManager;
     private $em;
     private $om;
+    private $messageManager;
 
     /** @var actionsRepository */
     private $actionsRepo;
@@ -35,7 +38,8 @@ class PiaTacheController extends Controller
      *      "authorization"   = @DI\Inject("security.authorization_checker"),
      *      "bulletinManager" = @DI\Inject("formalibre.manager.bulletin_manager"),
      *      "em"              = @DI\Inject("doctrine.orm.entity_manager"),
-     *      "om"              = @DI\Inject("claroline.persistence.object_manager")
+     *      "om"              = @DI\Inject("claroline.persistence.object_manager"),
+     *      "messageManager"     = @DI\Inject("claroline.manager.message_manager")
      * })
      */
 
@@ -43,13 +47,15 @@ class PiaTacheController extends Controller
         AuthorizationCheckerInterface $authorization,
         BulletinManager $bulletinManager,
         EntityManager $em,
-        ObjectManager $om
+        ObjectManager $om,
+        MessageManager $messageManager
     )
     {
         $this->authorization = $authorization;
         $this->bulletinManager = $bulletinManager;
         $this->em = $em;
         $this->om = $om;
+        $this->messageManager = $messageManager;
 
         $this->actionsRepo = $om->getRepository('FormaLibrePiaBundle:Actions');
         $this->suivisRepo = $om->getRepository('FormaLibrePiaBundle:Suivis');
@@ -88,6 +94,13 @@ class PiaTacheController extends Controller
                 $taches->setEleves($user);
                 $this->em->persist($taches);
                 $this->em->flush();
+            
+            $object="Concerne:".$taches->getEleves();
+            $content="Concerne: ".$taches->getEleves()."<br>"."Action :".$taches->getAction()."<br><br>".$taches->getTitre()."<br><br>".$taches->getCommentaire();
+            $users=[$taches->getResponsable()];
+            $message=$this->messageManager->create($content, $object,$users);
+            $this->messageManager->send($message);
+            
             }
             return new Response('success', 202);
         }
