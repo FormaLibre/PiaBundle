@@ -33,7 +33,7 @@ class SuiviType extends AbstractType
                 'class' => 'Claroline\CoreBundle\Entity\User',
                 'query_builder' => function (UserRepository $userRepository) {
                     $query = $userRepository->createQueryBuilder('u')
-                        ->join('u.roles', 'r', 'WITH', 'r.name = \'ROLE_PROF\'')
+                        ->join('u.roles', 'r', 'WITH', 'r.name = \'ROLE_PIA\'')
                         ->orderBy('u.lastName, u.firstName', 'ASC');
                     return $query;
                 },
